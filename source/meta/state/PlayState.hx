@@ -690,7 +690,7 @@ class PlayState extends MusicBeatState
 						if ((daNote.tooLate || !daNote.wasGoodHit) && (daNote.mustPress))
 						{
 							vocals.volume = 0;
-							missNoteCheck((Init.trueSettings.get('Ghost Tapping')) ? true : false, daNote.noteData, boyfriend, true);
+							missNoteCheck((Init.trueSettings.get('Ghost Tapping')) ? true : false, daNote.noteData, boyfriend, true, daNote);
 							// ambiguous name
 							Timings.updateAccuracy(0);
 						}
@@ -807,7 +807,19 @@ class PlayState extends MusicBeatState
 			coolNote.wasGoodHit = true;
 			vocals.volume = 1;
 
-			characterPlayAnimation(coolNote, character);
+			if (coolNote.noteType == 1){
+				var stringDirection:String = UIStaticArrow.getArrowFromNumber(coolNote.noteData);
+
+				FlxG.sound.play(Paths.soundRandom('missnote', 1, 3), FlxG.random.float(0.1, 0.2));
+				character.playAnim('sing' + stringDirection.toUpperCase() + 'miss', false);
+				vocals.volume = 0;
+				decreaseCombo(true);
+				return;
+			}
+			else{
+				characterPlayAnimation(coolNote, character);
+			}
+			
 			if (characterStrums.receptors.members[coolNote.noteData] != null)
 				characterStrums.receptors.members[coolNote.noteData].playAnim('confirm', true);
 
@@ -839,7 +851,7 @@ class PlayState extends MusicBeatState
 
 				if (!coolNote.isSustainNote)
 				{
-					increaseCombo(foundRating, coolNote.noteData, character);
+					increaseCombo(foundRating, coolNote.noteData, character, coolNote);
 					popUpScore(foundRating, ratingTiming, characterStrums, coolNote);
 					healthCall(Timings.judgementsMap.get(foundRating)[3]);
 				}
@@ -864,8 +876,13 @@ class PlayState extends MusicBeatState
 		}
 	}
 
-	function missNoteCheck(?includeAnimation:Bool = false, direction:Int = 0, character:Character, popMiss:Bool = false, lockMiss:Bool = false)
+	function missNoteCheck(?includeAnimation:Bool = false, direction:Int = 0, character:Character, popMiss:Bool = false, lockMiss:Bool = false, ?note:Note)
 	{
+
+		trace(note.noteType);
+		if (note.noteType == 1){
+			return;
+		}
 		if (includeAnimation)
 		{
 			var stringDirection:String = UIStaticArrow.getArrowFromNumber(direction);
@@ -1183,7 +1200,7 @@ class PlayState extends MusicBeatState
 		Timings.updateFCDisplay();
 	}
 
-	function increaseCombo(?baseRating:String, ?direction = 0, ?character:Character)
+	function increaseCombo(?baseRating:String, ?direction = 0, ?character:Character,type:Note )
 	{
 		// trolled this can actually decrease your combo if you get a bad/shit/miss
 		if (baseRating != null)
@@ -1195,7 +1212,7 @@ class PlayState extends MusicBeatState
 				combo += 1;
 			}
 			else
-				missNoteCheck(true, direction, character, false, true);
+				missNoteCheck(true, direction, character, false, true, type);
 		}
 	}
 

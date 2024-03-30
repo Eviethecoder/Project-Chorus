@@ -27,7 +27,30 @@ class Paths
 	}
 
 	//
-	static function getPath(file:String, type:AssetType, library:Null<String>)
+	public static function psychgetPath(file:String, type:AssetType, ?library:Null<String> = null)
+	{
+		if (library != null)
+			return getLibraryPath(file, library);
+
+		if (currentLevel != null)
+		{
+			var levelPath:String = '';
+			if (currentLevel != 'shared')
+			{
+				levelPath = getLibraryPathForce(file, currentLevel);
+				if (OpenFlAssets.exists(levelPath, type))
+					return levelPath;
+			}
+
+			levelPath = getLibraryPathForce(file, "shared");
+			if (OpenFlAssets.exists(levelPath, type))
+				return levelPath;
+		}
+
+		return getPreloadPath(file);
+	}
+	
+	static public function getPath(file:String, type:AssetType, library:Null<String>)
 	{
 		/*
 				Okay so, from what I understand, this loads in the current path based on the level
@@ -80,6 +103,16 @@ class Paths
 	static public function getLibraryPath(file:String, library = "preload")
 	{
 		return if (library == "preload" || library == "default") getPreloadPath(file); else getLibraryPathForce(file, library);
+	}
+
+
+	inline static public function fileExists(key:String, type:AssetType, ?ignoreMods:Bool = false, ?library:String)
+	{
+		if (OpenFlAssets.exists(psychgetPath(key, type)))
+		{
+			return true;
+		}
+		return false;
 	}
 
 	inline static function getLibraryPathForce(file:String, library:String)

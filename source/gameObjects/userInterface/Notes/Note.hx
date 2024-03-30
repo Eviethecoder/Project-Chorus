@@ -46,6 +46,7 @@ class Note extends FNFSprite
 
 	public static var swagWidth:Float = 160 * 0.7;
 
+
 	public function new(strumTime:Float, noteData:Int, noteAlt:Float, ?prevNote:Note, ?sustainNote:Bool = false)
 	{
 		super(x, y);
@@ -94,6 +95,8 @@ class Note extends FNFSprite
 	{
 		var newNote:Note = new Note(strumTime, noteData, noteAlt, prevNote, isSustainNote);
 
+		newNote.noteType = noteType;
+		//trace(noteType);
 		// frames originally go here
 		switch (assetModifier)
 		{
@@ -143,6 +146,28 @@ class Note extends FNFSprite
 				newNote.setGraphicSize(Std.int(newNote.width * 0.7));
 				newNote.updateHitbox();
 				newNote.antialiasing = true;
+				if (newNote.noteType == 1){
+					newNote.frames = Paths.getSparrowAtlas(ForeverTools.returnSkinAsset('HURTNOTE_assets', assetModifier, Init.trueSettings.get("Note Skin"),
+						'noteskins/notes'));
+					newNote.animation.addByPrefix('greenScroll', 'green0');
+					newNote.animation.addByPrefix('redScroll', 'red0');
+					newNote.animation.addByPrefix('blueScroll', 'blue0');
+					newNote.animation.addByPrefix('purpleScroll', 'purple0');
+					newNote.animation.addByPrefix('purpleholdend', 'pruple end hold');
+					newNote.animation.addByPrefix('greenholdend', 'green hold end');
+					newNote.animation.addByPrefix('redholdend', 'red hold end');
+					newNote.animation.addByPrefix('blueholdend', 'blue hold end');
+					newNote.animation.addByPrefix('purplehold', 'purple hold piece');
+					newNote.animation.addByPrefix('greenhold', 'green hold piece');
+					newNote.animation.addByPrefix('redhold', 'red hold piece');
+					newNote.animation.addByPrefix('bluehold', 'blue hold piece');
+					newNote.setGraphicSize(Std.int(newNote.width * 0.7));
+					newNote.updateHitbox();
+					newNote.antialiasing = true;
+					
+				}
+				
+				
 		}
 		//
 		if (!isSustainNote)
@@ -163,6 +188,34 @@ class Note extends FNFSprite
 			}
 		}
 		return newNote;
+	}
+
+	public function changeSkin()
+	{
+		var skin = 'NOTE_assets';
+		if (noteType == 1)
+		{
+			skin = 'HURTNOTE_assets';
+		}
+		if (noteType == 3)
+		{
+			skin = 'poison';
+		}
+		if (noteType == 5)
+		{
+			skin = 'flower';
+		}
+
+		animation.remove('greenScroll');
+		animation.remove('redScroll');
+		animation.remove('blueScroll');
+		animation.remove('purpleScroll');
+
+		loadGraphic(Paths.image('noteskins/notes/default/base/' + skin), true, 16, 16);
+		animation.add('greenScroll', [0]);
+		animation.add('redScroll', [0]);
+		animation.add('blueScroll', [0]);
+		animation.add('purpleScroll', [0]);
 	}
 
 	public static function returnQuantNote(assetModifier, strumTime, noteData, noteType, noteAlt, ?isSustainNote:Bool = false, ?prevNote:Note = null):Note

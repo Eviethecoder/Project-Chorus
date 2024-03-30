@@ -31,6 +31,7 @@ import meta.data.*;
 import meta.data.Conductor.BPMChangeEvent;
 import meta.data.Section.SwagSection;
 import meta.data.Song.SwagSong;
+import meta.data.dependency.AbsoluteText;
 import openfl.events.Event;
 import openfl.events.IOErrorEvent;
 import openfl.media.Sound;
@@ -59,11 +60,14 @@ class OriginalChartingState extends MusicBeatState
 	public static var lastSection:Int = 0;
 
 	var bpmTxt:FlxText;
+	var noteTypeDropDown:FlxUIDropDownMenu;
+	private var blockPressWhileScrolling:Array<FlxUIDropDownMenu> = [];
 
 	var strumLine:FlxSprite;
 	var curSong:String = 'Dadbattle';
 	var amountSteps:Int = 0;
 	var bullshitUI:FlxGroup;
+	
 
 	var highlight:FlxSprite;
 
@@ -73,6 +77,7 @@ class OriginalChartingState extends MusicBeatState
 
 	var curRenderedNotes:FlxTypedGroup<Note>;
 	var curRenderedSustains:FlxTypedGroup<FlxSprite>;
+	var curRenderedTexts:FlxTypedGroup<AbsoluteText> = new FlxTypedGroup<AbsoluteText>();
 
 	var gridBG:FlxSprite;
 
@@ -90,7 +95,14 @@ class OriginalChartingState extends MusicBeatState
 
 	var leftIcon:HealthIcon;
 	var rightIcon:HealthIcon;
+	public static var noteTypeList:Array<String> = // Used for backwards compatibility with 0.1 - 0.3.2 charts, though, you should add your hardcoded custom note types here too.
+		[
+			'',
+			'hurt', 
+		];
 
+	private var noteTypeIntMap:Map<Int, String> = new Map<Int, String>();
+	private var noteTypeMap:Map<String, Null<Int>> = new Map<String, Null<Int>>();
 	override function create()
 	{
 		super.create();
@@ -180,6 +192,7 @@ class OriginalChartingState extends MusicBeatState
 		addNoteUI();
 
 		add(curRenderedNotes);
+		add(curRenderedTexts);
 		add(curRenderedSustains);
 	}
 
@@ -235,6 +248,12 @@ class OriginalChartingState extends MusicBeatState
 		stepperBPM.name = 'song_bpm';
 
 		var characters:Array<String> = CoolUtil.coolTextFile(Paths.txt('characterList'));
+
+		var player1DropDown = new FlxUIDropDownMenu(10, 100, FlxUIDropDownMenu.makeStrIdLabelArray(characters, true), function(character:String)
+		{
+			_song.player1 = characters[Std.parseInt(character)];
+			updateHeads();
+		});
 
 		var player1DropDown = new FlxUIDropDownMenu(10, 100, FlxUIDropDownMenu.makeStrIdLabelArray(characters, true), function(character:String)
 		{
@@ -358,9 +377,37 @@ class OriginalChartingState extends MusicBeatState
 		stepperType.value = 0;
 		stepperType.name = 'note_type';
 
+		var key:Int = 0;
+		var displayNameList:Array<String> = [];
+		while (key < noteTypeList.length)
+		{
+			displayNameList.push(noteTypeList[key]);
+			noteTypeMap.set(noteTypeList[key], key);
+			noteTypeIntMap.set(key, noteTypeList[key]);
+			key++;
+		}
+
 		tab_group_note.add(stepperType);
 
+		for (i in 1...displayNameList.length)
+		{
+			displayNameList[i] = i + '. ' + displayNameList[i];
+		}
+
+		noteTypeDropDown = new FlxUIDropDownMenu(10, 105, FlxUIDropDownMenu.makeStrIdLabelArray(displayNameList, true), function(character:String)
+		{
+			curNoteType = Std.parseInt(character);
+			if (curSelectedNote != null && curSelectedNote[1] > -1)
+			{
+				curSelectedNote[3] = noteTypeIntMap.get(curNoteType);
+				updateGrid();
+			}
+		});
+		blockPressWhileScrolling.push(noteTypeDropDown);
+
 		UI_box.addGroup(tab_group_note);
+		tab_group_note.add(noteTypeDropDown);
+		tab_group_note.add(new FlxText(10, 90, 0, 'Note type:'));
 		// I'm genuinely tempted to go around and remove every instance of the word "sus" it is genuinely killing me inside
 	}
 
@@ -537,6 +584,12 @@ class OriginalChartingState extends MusicBeatState
 						if (FlxG.keys.pressed.CONTROL)
 						{
 							selectNote(note);
+						}
+						else if (FlxG.keys.pressed.ALT)
+						{
+							selectNote(note);
+							curSelectedNote[3] = noteTypeIntMap.get(curNoteType);
+							updateGrid();
 						}
 						else
 						{
@@ -838,10 +891,23 @@ class OriginalChartingState extends MusicBeatState
 	{
 		if (curSelectedNote != null)
 			stepperSusLength.value = curSelectedNote[2];
+		if (curSelectedNote[3] != null)
+		{
+			curNoteType = noteTypeMap.get(curSelectedNote[3]);
+			if (curNoteType <= 0)
+			{
+				noteTypeDropDown.selectedLabel = '';
+			}
+			else
+			{
+				noteTypeDropDown.selectedLabel = curNoteType + '. ' + curSelectedNote[3];
+			}
+		}
 	}
 
 	function updateGrid():Void
 	{
+		curRenderedTexts.clear();
 		while (curRenderedNotes.members.length > 0)
 		{
 			curRenderedNotes.remove(curRenderedNotes.members[0], true);
@@ -885,13 +951,18 @@ class OriginalChartingState extends MusicBeatState
 
 		for (i in sectionInfo)
 		{
+
+			//i think the isue is here. but i do not know how to fix.
 			var daNoteInfo = i[1];
 			var daStrumTime = i[0];
 			var daSus = i[2];
 			var daNoteType = 0;
-
 			if (i.length > 2)
 				daNoteType = i[3];
+				trace(daNoteType);
+
+			
+			
 
 			var note:Note = ForeverAssets.generateArrow(PlayState.assetModifier, daStrumTime, daNoteInfo % 4, daNoteType, 0);
 			note.sustainLength = daSus;
@@ -909,6 +980,17 @@ class OriginalChartingState extends MusicBeatState
 					note.y + GRID_SIZE).makeGraphic(8, Math.floor(FlxMath.remapToRange(daSus, 0, Conductor.stepCrochet * 16, 0, gridBG.height)));
 				curRenderedSustains.add(sustainVis);
 			}
+			// if (daNoteType != 0)
+			// {
+				
+			// 	var noteTypeNum:AbsoluteText = new AbsoluteText(100, $daNoteType );
+			// 	noteTypeNum.setFormat(24);
+			// 	noteTypeNum.offsetX = -32;
+			// 	noteTypeNum.offsetY = 6;
+			// 	noteTypeNum.borderSize = 1;
+			// 	curRenderedTexts.add(noteTypeNum);
+			// 	noteTypeNum.parent = note;
+			// }
 		}
 	}
 
@@ -981,6 +1063,7 @@ class OriginalChartingState extends MusicBeatState
 		var noteStrum = getStrumTime(dummyArrow.y) + sectionStartTime();
 		var noteData = Math.floor(FlxG.mouse.x / GRID_SIZE);
 		var noteType = curNoteType; // define notes as the current type
+	
 		var noteSus = 0; // ninja you will NOT get away with this
 
 		_song.notes[curSection].sectionNotes.push([noteStrum, noteData, noteSus, noteType]);

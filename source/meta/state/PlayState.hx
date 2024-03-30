@@ -435,11 +435,7 @@ class PlayState extends MusicBeatState
 				// charting state (more on that later)
 				if ((FlxG.keys.justPressed.SEVEN) && (!startingSong))
 				{
-					resetMusic();
-					if (Init.trueSettings.get('Use Forever Chart Editor'))
-						Main.switchState(this, new ChartingState());
-					else
-						Main.switchState(this, new OriginalChartingState());
+					Main.switchState(this, new OriginalChartingState());
 				}
 			}
 
@@ -571,6 +567,8 @@ class PlayState extends MusicBeatState
 			// spawn in the notes from the array
 			if ((unspawnNotes[0] != null) && ((unspawnNotes[0].strumTime - Conductor.songPosition) < 3500))
 			{
+
+		
 				var dunceNote:Note = unspawnNotes[0];
 				// push note to its correct strumline
 				strumLines.members[Math.floor((dunceNote.noteData + (dunceNote.mustPress ? 4 : 0)) / numberOfKeys)].push(dunceNote);

@@ -814,7 +814,6 @@ class PlayState extends MusicBeatState
 				character.playAnim('sing' + stringDirection.toUpperCase() + 'miss', false);
 				vocals.volume = 0;
 				decreaseCombo(true);
-				return;
 			}
 			else{
 				characterPlayAnimation(coolNote, character);
@@ -849,13 +848,13 @@ class PlayState extends MusicBeatState
 					}
 				}
 
-				if (!coolNote.isSustainNote)
+				if (!coolNote.isSustainNote && coolNote.noteType != 1)
 				{
 					increaseCombo(foundRating, coolNote.noteData, character, coolNote);
 					popUpScore(foundRating, ratingTiming, characterStrums, coolNote);
 					healthCall(Timings.judgementsMap.get(foundRating)[3]);
 				}
-				else if (coolNote.isSustainNote)
+				else if (coolNote.isSustainNote && coolNote.noteType != 1)
 				{
 					// call updated accuracy stuffs
 					Timings.updateAccuracy(100, true);
@@ -880,10 +879,8 @@ class PlayState extends MusicBeatState
 	{
 
 		trace(note.noteType);
-		if (note.noteType == 1){
-			return;
-		}
-		if (includeAnimation)
+		
+		if (includeAnimation && note.noteType != 1)
 		{
 			var stringDirection:String = UIStaticArrow.getArrowFromNumber(direction);
 

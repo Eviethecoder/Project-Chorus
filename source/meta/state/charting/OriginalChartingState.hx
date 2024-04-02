@@ -67,6 +67,9 @@ class OriginalChartingState extends MusicBeatState
 	var curSong:String = 'Dadbattle';
 	var amountSteps:Int = 0;
 	var bullshitUI:FlxGroup;
+
+	var playSoundBf:FlxUICheckBox = null;
+	var playSoundDad:FlxUICheckBox = null;
 	
 
 	var curZoom:Int = 1;
@@ -95,6 +98,7 @@ class OriginalChartingState extends MusicBeatState
 	var tempBpm:Float = 0;
 
 	var vocals:FlxSound;
+	var playedNote:Array<Note> = [];
 
 	var leftIcon:HealthIcon;
 	var rightIcon:HealthIcon;
@@ -175,6 +179,7 @@ class OriginalChartingState extends MusicBeatState
 
 		var tabs = [
 			{name: "Song", label: 'Song'},
+			{name: "Charting", label: 'Charting'},
 			{name: "Section", label: 'Section'},
 			{name: "Note", label: 'Note'}
 		];
@@ -186,10 +191,11 @@ class OriginalChartingState extends MusicBeatState
 		UI_box.y = 20;
 		add(UI_box);
 
+
+		addChartingUI();
 		addSongUI();
 		addSectionUI();
 		addNoteUI();
-
 		add(curRenderedNotes);
 		add(curRenderedTexts);
 		add(curRenderedSustains);
@@ -295,6 +301,19 @@ class OriginalChartingState extends MusicBeatState
 	var check_changeBPM:FlxUICheckBox;
 	var stepperSectionBPM:FlxUINumericStepper;
 	var check_altAnim:FlxUICheckBox;
+
+
+	function addChartingUI()
+	{
+		var tab_group_chart = new FlxUI(null, UI_box);
+		tab_group_chart.name = 'Charting';
+
+		var hitsounds = new FlxUICheckBox(10, 260, null, null, "Enable (Makeshift) Hitsounds", 100);
+		hitsounds.checked = enableHitsounds;
+
+		tab_group_chart.add(hitsounds);
+		UI_box.addGroup(tab_group_chart);
+	}
 
 	function addSectionUI():Void
 	{
@@ -448,6 +467,7 @@ class OriginalChartingState extends MusicBeatState
 
 		songMusic.pause();
 		vocals.pause();
+		playedNote = [];
 	}
 
 
@@ -481,6 +501,7 @@ class OriginalChartingState extends MusicBeatState
 		 */
 	}
 
+	public static var enableHitsounds:Bool = false;
 	override function getEvent(id:String, sender:Dynamic, data:Dynamic, ?params:Array<Dynamic>)
 	{
 		if (id == FlxUICheckBox.CLICK_EVENT)
@@ -493,6 +514,8 @@ class OriginalChartingState extends MusicBeatState
 					_song.notes[curSection].mustHitSection = check.checked;
 
 					updateHeads();
+				case 'Enable (Makeshift) Hitsounds':
+					enableHitsounds = check.checked;
 
 				case 'Change BPM':
 					_song.notes[curSection].changeBPM = check.checked;
@@ -558,6 +581,7 @@ class OriginalChartingState extends MusicBeatState
 		return daPos;
 	}
 
+	var lastConductorPos:Float;
 	override function update(elapsed:Float)
 	{
 		curStep = recalculateSteps();
@@ -678,6 +702,7 @@ class OriginalChartingState extends MusicBeatState
 				{
 					songMusic.pause();
 					vocals.pause();
+					playedNote = [];
 				}
 				else
 				{
@@ -698,6 +723,7 @@ class OriginalChartingState extends MusicBeatState
 			{
 				songMusic.pause();
 				vocals.pause();
+				playedNote = [];
 
 				songMusic.time -= (FlxG.mouse.wheel * Conductor.stepCrochet * 0.4);
 				vocals.time = songMusic.time;
@@ -709,6 +735,7 @@ class OriginalChartingState extends MusicBeatState
 				{
 					songMusic.pause();
 					vocals.pause();
+					playedNote = [];
 
 					var daTime:Float = 700 * FlxG.elapsed;
 
@@ -728,6 +755,7 @@ class OriginalChartingState extends MusicBeatState
 				{
 					songMusic.pause();
 					vocals.pause();
+					playedNote = [];
 
 					var daTime:Float = Conductor.stepCrochet * 2;
 
@@ -773,6 +801,31 @@ class OriginalChartingState extends MusicBeatState
 			+ Std.string(FlxMath.roundDecimal(songMusic.length / 1000, 2))
 			+ "\nSection: "
 			+ curSection;
+
+
+		
+
+		var cancel:Bool = false; // only play one hitsound per frame so no overlayering
+		if (songMusic.playing && enableHitsounds)
+		{
+			curRenderedNotes.forEachAlive(function(note:Note):Void
+			{
+				note.alpha = 1;
+
+				if (note.strumTime <= Conductor.songPosition)
+				{
+					note.alpha = 0.4;
+				}
+				if (!cancel && !playedNote.contains(note) && (note.strumTime <= Conductor.songPosition))
+				{
+					if (Math.abs(Conductor.songPosition - note.strumTime) < 20)
+						FlxG.sound.play(Paths.sound('hitsound'));
+					playedNote.push(note);
+					cancel = true;
+					return;
+				}
+			});
+		}
 		super.update(elapsed);
 	}
 
@@ -816,7 +869,7 @@ class OriginalChartingState extends MusicBeatState
 
 		songMusic.pause();
 		vocals.pause();
-
+		playedNote = [];
 		// Basically old shit from changeSection???
 		songMusic.time = sectionStartTime();
 
@@ -847,6 +900,7 @@ class OriginalChartingState extends MusicBeatState
 			{
 				songMusic.pause();
 				vocals.pause();
+				playedNote = [];
 
 				/*var daNum:Int = 0;
 					var daLength:Float = 0;
@@ -999,6 +1053,9 @@ class OriginalChartingState extends MusicBeatState
 			// 	curRenderedTexts.add(noteTypeNum);
 			// 	noteTypeNum.parent = note;
 			// }
+			note.mustPress = _song.notes[curSection].mustHitSection;
+			if (i[1] > 3)
+				note.mustPress = !note.mustPress;
 		}
 	}
 	function setupSusNote(note:Note):FlxSprite

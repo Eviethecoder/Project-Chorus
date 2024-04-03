@@ -17,6 +17,16 @@ import openfl.utils.Assets as OpenFlAssets;
 
 using StringTools;
 
+typedef CharacterData =
+{
+	var offsetX:Float;
+	var offsetY:Float;
+	var camOffsetX:Float;
+	var camOffsetY:Float;
+	var quickDancer:Bool;
+	var healthbarColors:Array<Int>;
+}
+
 class Character extends FNFSprite
 {
 	// By default, this option set to FALSE will make it so that the character only dances twice per major beat hit
@@ -29,6 +39,8 @@ class Character extends FNFSprite
 	public var curCharacter:String = 'bf';
 
 	public var holdTimer:Float = 0;
+
+	public var characterData:CharacterData;
 
 	public function new(x:Float, y:Float, ?character:String = "bf", ?isPlayer:Bool = false)
 	{
@@ -43,6 +55,15 @@ class Character extends FNFSprite
 		curCharacter = character;
 		var tex:FlxAtlasFrames;
 		antialiasing = true;
+
+		characterData = {
+			offsetY: 0,
+			offsetX: 0,
+			camOffsetY: 0,
+			camOffsetX: 0,
+			quickDancer: false,
+			healthbarColors: [0, 0, 0]
+		};
 
 		switch (curCharacter)
 		{
@@ -63,6 +84,8 @@ class Character extends FNFSprite
 				animation.addByPrefix('scared', 'GF FEAR', 24);
 
 				playAnim('danceRight');
+
+				characterData.healthbarColors = [165, 0, 77];
 
 			case 'gf-christmas':
 				tex = Paths.getSparrowAtlas('characters/gfChristmas');
@@ -130,6 +153,8 @@ class Character extends FNFSprite
 				animation.addByPrefix('singLEFT', 'Dad Sing Note LEFT', 24);
 
 				playAnim('idle');
+
+				characterData.healthbarColors = [165, 0, 77];
 			case 'spooky':
 				tex = Paths.getSparrowAtlas('characters/spooky_kids_assets');
 				frames = tex;
@@ -240,6 +265,7 @@ class Character extends FNFSprite
 
 				playAnim('idle');
 
+				characterData.healthbarColors = [49, 176, 209];
 				flipX = true;
 			/*
 				case 'bf-og':

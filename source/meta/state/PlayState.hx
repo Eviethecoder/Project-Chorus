@@ -497,7 +497,7 @@ class PlayState extends MusicBeatState
 							getCenterX = char.getMidpoint().x - 100;
 					}
 
-					camFollow.setPosition(getCenterX + (camDisplaceX * 8), getCenterY);
+					camFollow.setPosition(getCenterX + (camDisplaceX * 8), getCenterY + (camDisplaceY * 8));
 
 					if (char.curCharacter == 'mom')
 						vocals.volume = 1;
@@ -1038,7 +1038,7 @@ class PlayState extends MusicBeatState
 	{
 		if (!Init.trueSettings.get('No Camera Note Movement'))
 		{
-			var camDisplaceExtend:Float = 15;
+			var camDisplaceExtend:Float = 7;
 			if (PlayState.SONG.notes[Std.int(curStep / 16)] != null)
 			{
 				if ((PlayState.SONG.notes[Std.int(curStep / 16)].mustHitSection && mustHit)

@@ -94,6 +94,7 @@ class OriginalChartingState extends MusicBeatState
 	var curRenderedTexts:FlxTypedGroup<AbsoluteText> = new FlxTypedGroup<AbsoluteText>();
 
 	var gridBG:FlxSprite;
+	var lilBuddiesBox:FlxUICheckBox;
 
 	var _song:SwagSong;
 
@@ -537,6 +538,7 @@ class OriginalChartingState extends MusicBeatState
 
 		gridBG = FlxGridOverlay.create(GRID_SIZE, GRID_SIZE, GRID_SIZE * 8, GRID_SIZE * 16 * Std.int(zoomList[curZoom]));
 		add(gridBG);
+
 		var gridBlackLine:FlxSprite = new FlxSprite(gridBG.x + gridBG.width / 2).makeGraphic(2, Std.int(gridBG.height), FlxColor.BLACK);
 
 		add(gridBlackLine);

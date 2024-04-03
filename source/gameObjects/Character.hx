@@ -103,6 +103,7 @@ class Character extends FNFSprite
 				animation.addByPrefix('scared', 'GF FEAR', 24);
 
 				playAnim('danceRight');
+				characterData.healthbarColors = [165, 0, 77];
 
 			case 'gf-car':
 				tex = Paths.getSparrowAtlas('characters/gfCar');
@@ -117,6 +118,7 @@ class Character extends FNFSprite
 
 				playAnim('danceRight');
 
+				characterData.healthbarColors = [165, 0, 77];
 			case 'gf-pixel':
 				tex = Paths.getSparrowAtlas('characters/gfPixel');
 				frames = tex;
@@ -168,6 +170,7 @@ class Character extends FNFSprite
 				quickDancer = true;
 
 				playAnim('danceRight');
+				characterData.healthbarColors = [165, 0, 77];
 			case 'mom':
 				tex = Paths.getSparrowAtlas('characters/Mom_Assets');
 				frames = tex;
@@ -184,6 +187,7 @@ class Character extends FNFSprite
 				animation.addByPrefix('singRIGHT', 'Mom Pose Left', 24, false);
 
 				playAnim('idle');
+				characterData.healthbarColors = [165, 0, 77];
 
 			case 'mom-car':
 				tex = Paths.getSparrowAtlas('characters/momCar');
@@ -199,6 +203,7 @@ class Character extends FNFSprite
 				animation.addByPrefix('singRIGHT', 'Mom Pose Left', 24, false);
 
 				playAnim('idle');
+				characterData.healthbarColors = [165, 0, 77];
 			case 'monster':
 				tex = Paths.getSparrowAtlas('characters/Monster_Assets');
 				frames = tex;
@@ -209,6 +214,7 @@ class Character extends FNFSprite
 				animation.addByPrefix('singRIGHT', 'Monster left note', 24, false);
 
 				playAnim('idle');
+				characterData.healthbarColors = [165, 0, 77];
 			case 'monster-christmas':
 				tex = Paths.getSparrowAtlas('characters/monsterChristmas');
 				frames = tex;
@@ -219,6 +225,8 @@ class Character extends FNFSprite
 				animation.addByPrefix('singRIGHT', 'Monster Right note', 24, false);
 
 				playAnim('idle');
+				characterData.healthbarColors = [165, 0, 77];
+
 			case 'pico':
 				tex = Paths.getSparrowAtlas('characters/Pico_FNF_assetss');
 				frames = tex;
@@ -247,6 +255,7 @@ class Character extends FNFSprite
 				playAnim('idle');
 
 				flipX = true;
+				characterData.healthbarColors = [165, 0, 77];
 
 			case 'bf':
 				frames = Paths.getSparrowAtlas('characters/BOYFRIEND');
@@ -301,6 +310,7 @@ class Character extends FNFSprite
 				playAnim('firstDeath');
 
 				flipX = true;
+				characterData.healthbarColors = [49, 176, 209];
 
 			case 'bf-holding-gf':
 				frames = Paths.getSparrowAtlas('characters/bfAndGF');
@@ -317,6 +327,7 @@ class Character extends FNFSprite
 
 				playAnim('idle');
 
+				characterData.healthbarColors = [49, 176, 209];
 				flipX = true;
 
 			case 'bf-holding-gf-dead':
@@ -327,6 +338,7 @@ class Character extends FNFSprite
 				animation.addByPrefix('deathConfirm', "RETRY confirm holding gf", 24, false);
 
 				playAnim('firstDeath');
+				characterData.healthbarColors = [49, 176, 209];
 
 			case 'bf-christmas':
 				var tex = Paths.getSparrowAtlas('characters/bfChristmas');
@@ -345,6 +357,7 @@ class Character extends FNFSprite
 				playAnim('idle');
 
 				flipX = true;
+				characterData.healthbarColors = [49, 176, 209];
 			case 'bf-car':
 				var tex = Paths.getSparrowAtlas('characters/bfCar');
 				frames = tex;
@@ -362,6 +375,7 @@ class Character extends FNFSprite
 				playAnim('idle');
 
 				flipX = true;
+				characterData.healthbarColors = [49, 176, 209];
 			case 'bf-pixel':
 				frames = Paths.getSparrowAtlas('characters/bfPixel');
 				animation.addByPrefix('idle', 'BF IDLE', 24, false);
@@ -385,6 +399,7 @@ class Character extends FNFSprite
 				antialiasing = false;
 
 				flipX = true;
+				characterData.healthbarColors = [49, 176, 209];
 			case 'bf-pixel-dead':
 				frames = Paths.getSparrowAtlas('characters/bfPixelsDEAD');
 				animation.addByPrefix('singUP', "BF Dies pixel", 24, false);
@@ -412,6 +427,7 @@ class Character extends FNFSprite
 				setGraphicSize(Std.int(width * 6));
 				updateHitbox();
 
+				characterData.healthbarColors = [165, 0, 77];
 				antialiasing = false;
 			case 'senpai-angry':
 				frames = Paths.getSparrowAtlas('characters/senpai');
@@ -425,6 +441,7 @@ class Character extends FNFSprite
 				updateHitbox();
 
 				antialiasing = false;
+				characterData.healthbarColors = [165, 0, 77];
 
 			case 'spirit':
 				frames = Paths.getPackerAtlas('characters/spirit');
@@ -440,6 +457,7 @@ class Character extends FNFSprite
 				playAnim('idle');
 
 				antialiasing = false;
+				characterData.healthbarColors = [165, 0, 77];
 
 			case 'parents-christmas':
 				frames = Paths.getSparrowAtlas('characters/mom_dad_christmas_assets');
@@ -456,6 +474,7 @@ class Character extends FNFSprite
 				animation.addByPrefix('singRIGHT-alt', 'Parent Right Note Mom', 24, false);
 
 				playAnim('idle');
+				characterData.healthbarColors = [165, 0, 77];
 			case 'tankman':
 				frames = Paths.getSparrowAtlas('characters/tankmanCaptain');
 				animation.addByPrefix('idle', 'Tankman Idle Dance instance', 24, false);
@@ -469,6 +488,7 @@ class Character extends FNFSprite
 				animation.addByPrefix('singDOWN-alt', 'PRETTY GOOD tankman instance', 24, false);
 
 				flipX = true;
+				characterData.healthbarColors = [165, 0, 77];
 				playAnim('idle');
 			// flipX = true;
 			case 'pico-speaker':
@@ -480,6 +500,7 @@ class Character extends FNFSprite
 				animation.addByPrefix('shoot4', 'Pico shoot 4', 24, false);
 
 				playAnim('shoot1');
+				characterData.healthbarColors = [165, 0, 77];
 			default:
 				// set up animations if they aren't already
 

@@ -236,8 +236,15 @@ class FreeplayState extends MusicBeatState
 				FlxG.sound.music.stop();
 
 			threadActive = false;
-
-			Main.switchState(this, new PlayState());
+			if (FlxG.keys.pressed.SHIFT)
+			{
+				//Main.switchState(this, new  ChartingState());
+			}
+			else
+			{
+				Main.switchState(this, new PlayState());
+			}
+			
 		}
 
 		// Adhere the position of all the things (I'm sorry it was just so ugly before I had to fix it Shubs)

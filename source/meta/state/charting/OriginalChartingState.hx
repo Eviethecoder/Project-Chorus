@@ -73,11 +73,15 @@ class OriginalChartingState extends MusicBeatState
 	var curSong:String = 'Dadbattle';
 	var amountSteps:Int = 0;
 	var bullshitUI:FlxGroup;
+	var check_mute_inst:FlxUICheckBox = null;
 
 	var stepperBeats:FlxUINumericStepper;
 	public var waveformSprite:FlxSprite;
 	var playSoundBf:FlxUICheckBox = null;
 	var playSoundDad:FlxUICheckBox = null;
+	var instVolume:FlxUINumericStepper;
+	var voicesVolume:FlxUINumericStepper;
+	var oppvoicesVolume:FlxUINumericStepper;
 	
 
 	var curZoom:Int = 1;
@@ -111,6 +115,7 @@ class OriginalChartingState extends MusicBeatState
 	#end
 
 	var vocals:FlxSound;
+	var oppvocals:FlxSound;
 	var playedNote:Array<Note> = [];
 
 	var leftIcon:HealthIcon;
@@ -146,17 +151,20 @@ class OriginalChartingState extends MusicBeatState
 			_song = PlayState.SONG;
 		else
 		{
-			/*
+			
 				_song = {
 					song: 'Test',
 					notes: [],
 					bpm: 150,
+					stage: 'stage',
+					noteSkin: '',
 					needsVoices: true,
+					needsoppVoices: false,
 					player1: 'bf',
 					player2: 'dad',
 					speed: 1,
 					validScore: false
-			};*/
+			};
 		}
 
 		leftIcon = new HealthIcon(_song.player1);
@@ -240,6 +248,15 @@ class OriginalChartingState extends MusicBeatState
 			trace('CHECKED!');
 		};
 
+		var check_oppvoices = new FlxUICheckBox(10, -35, null, null, "Has oppvoice track", 100);
+		check_oppvoices.checked = _song.needsoppVoices;
+		// _song.needsVoices = check_voices.checked;
+		check_oppvoices.callback = function()
+		{
+			_song.needsoppVoices = check_oppvoices.checked;
+			// trace('CHECKED!');
+		};
+
 		var check_mute_inst = new FlxUICheckBox(10, 200, null, null, "Mute Instrumental (in editor)", 100);
 		check_mute_inst.checked = false;
 		check_mute_inst.callback = function()
@@ -305,6 +322,7 @@ class OriginalChartingState extends MusicBeatState
 		tab_group_song.name = "Song";
 		tab_group_song.add(UI_songTitle);
 
+		tab_group_song.add(check_oppvoices);
 		tab_group_song.add(check_voices);
 		tab_group_song.add(check_mute_inst);
 		tab_group_song.add(saveButton);
@@ -361,10 +379,77 @@ class OriginalChartingState extends MusicBeatState
 		var tab_group_chart = new FlxUI(null, UI_box);
 		tab_group_chart.name = 'Charting';
 
+		check_mute_inst = new FlxUICheckBox(10, 310, null, null, "Mute Instrumental (in editor)", 100);
+		check_mute_inst.checked = false;
+		check_mute_inst.callback = function()
+		{
+			var vol:Float = 1;
+
+			if (check_mute_inst.checked)
+				vol = 0;
+
+			FlxG.sound.music.volume = vol;
+		};
+		instVolume = new FlxUINumericStepper(15, 270, 0.1, 1, 0, 1, 1);
+		instVolume.value = FlxG.sound.music.volume;
+		instVolume.name = 'inst_volume';
+		//blockPressWhileTypingOnStepper.push(instVolume);
+
+		voicesVolume = new FlxUINumericStepper(instVolume.x + 100, instVolume.y, 0.1, 1, 0, 1, 1);
+		voicesVolume.value = vocals.volume;
+		voicesVolume.name = 'voices_volume';
+		//blockPressWhileTypingOnStepper.push(voicesVolume);
+
+		oppvoicesVolume = new FlxUINumericStepper(instVolume.x + 100, instVolume.y, 0.1, 1, 0, 1, 1);
+		oppvoicesVolume.value = oppvocals.volume;
+		oppvoicesVolume.name = 'oppvoices_volume';
+		//blockPressWhileTypingOnStepper.push(oppvoicesVolume);
+
 		var hitsounds = new FlxUICheckBox(10, 260, null, null, "Enable (Makeshift) Hitsounds", 100);
 		hitsounds.checked = enableHitsounds;
+		var check_mute_vocals = new FlxUICheckBox(check_mute_inst.x + 120, check_mute_inst.y, null, null, "Mute Vocals (in editor)", 100);
+		check_mute_vocals.checked = false;
+		check_mute_vocals.callback = function()
+		{
+			if (vocals != null)
+			{
+				var vol:Float = 1;
 
+				if (check_mute_vocals.checked)
+					vol = 0;
+				else
+					vol = 1;
+
+				//vocals.volume = vol;
+				trace(vocals);
+			}
+		};
+
+		var check_mute_opp_vocals = new FlxUICheckBox(check_mute_vocals.x + 120, check_mute_vocals.y, null, null, "Mute opp Vocals (in editor)", 100);
+		check_mute_opp_vocals.checked = false;
+		check_mute_opp_vocals.callback = function()
+		{
+			if (oppvocals != null)
+			{
+				var vol:Float = 1;
+
+				if (check_mute_opp_vocals.checked)
+					vol = 0;
+				else
+					vol = 1;
+
+				oppvocals.volume = vol;
+			}
+		};
+
+		tab_group_chart.add(new FlxText(instVolume.x, instVolume.y - 25, 0, 'Inst Volume'));
+		tab_group_chart.add(new FlxText(voicesVolume.x, voicesVolume.y - 15, 0, 'Voices Volume'));
+		tab_group_chart.add(voicesVolume);
+		tab_group_chart.add(oppvoicesVolume);
 		tab_group_chart.add(hitsounds);
+		tab_group_chart.add(check_mute_inst);
+		tab_group_chart.add(check_mute_vocals);
+		tab_group_chart.add(check_mute_opp_vocals);
 		UI_box.addGroup(tab_group_chart);
 		tab_group_chart.add(waveformUseVoices);
 	}
@@ -499,22 +584,30 @@ class OriginalChartingState extends MusicBeatState
 		if (vocals != null)
 			vocals.stop();
 
+		if (oppvocals != null)
+			oppvocals.stop();
+
 		songMusic = new FlxSound().loadEmbedded(Sound.fromFile('./' + Paths.inst(daSong)), false, true);
 		if (_song.needsVoices)
 			vocals = new FlxSound().loadEmbedded(Sound.fromFile('./' + Paths.voices(daSong)), false, true);
+		if (_song.needsoppVoices)
+			oppvocals = new FlxSound().loadEmbedded(Sound.fromFile('./' + Paths.oppvoices(daSong)), false, true);
 		else
 			vocals = new FlxSound();
+			oppvocals = new FlxSound();
 		FlxG.sound.list.add(songMusic);
 		FlxG.sound.list.add(vocals);
+		FlxG.sound.list.add(oppvocals);
 
 		songMusic.play();
 		vocals.play();
+		oppvocals.play();
 
 		pauseMusic();
 
 		songMusic.onComplete = function()
 		{
-			ForeverTools.killMusic([songMusic, vocals]);
+			ForeverTools.killMusic([songMusic, vocals, oppvocals]);
 			loadSong(daSong);
 		};
 		//
@@ -527,6 +620,7 @@ class OriginalChartingState extends MusicBeatState
 
 		songMusic.pause();
 		vocals.pause();
+		oppvocals.pause();
 		playedNote = [];
 	}
 
@@ -850,6 +944,10 @@ class OriginalChartingState extends MusicBeatState
 				case 'note_type':
 					curNoteType = Std.int(nums.value); // oh yeah dont forget this has to be an integer
 				// set the new note type for when placing notes next!
+				case 'voices_volume ':
+					vocals.volume = nums.value;
+				case 'oppvoices_volume ':
+					oppvocals.volume = nums.value;
 				case 'section_bpm':
 					_song.notes[curSection].bpm = Std.int(nums.value); // redefine the section's bpm
 					updateGrid(); // update the note grid
@@ -969,6 +1067,7 @@ class OriginalChartingState extends MusicBeatState
 			PlayState.SONG = _song;
 			songMusic.stop();
 			vocals.stop();
+			oppvocals.stop();
 			Main.switchState(this, new PlayState());
 		}
 
@@ -1005,12 +1104,14 @@ class OriginalChartingState extends MusicBeatState
 				{
 					songMusic.pause();
 					vocals.pause();
+					oppvocals.pause();
 					playedNote = [];
 					
 				}
 				else
 				{
 					vocals.play();
+					oppvocals.play();
 					songMusic.play();
 					
 				}
@@ -1028,10 +1129,12 @@ class OriginalChartingState extends MusicBeatState
 			{
 				songMusic.pause();
 				vocals.pause();
+				oppvocals.pause();
 				playedNote = [];
 
 				songMusic.time -= (FlxG.mouse.wheel * Conductor.stepCrochet * 0.4);
 				vocals.time = songMusic.time;
+				oppvocals.time = songMusic.time;
 			}
 
 			if (!FlxG.keys.pressed.SHIFT)
@@ -1040,6 +1143,7 @@ class OriginalChartingState extends MusicBeatState
 				{
 					songMusic.pause();
 					vocals.pause();
+					oppvocals.pause();
 					playedNote = [];
 
 					var daTime:Float = 700 * FlxG.elapsed;
@@ -1052,6 +1156,7 @@ class OriginalChartingState extends MusicBeatState
 						songMusic.time += daTime;
 
 					vocals.time = songMusic.time;
+					oppvocals.time = songMusic.time;
 				}
 			}
 			else
@@ -1060,6 +1165,7 @@ class OriginalChartingState extends MusicBeatState
 				{
 					songMusic.pause();
 					vocals.pause();
+					oppvocals.pause();
 					playedNote = [];
 
 					var daTime:Float = Conductor.stepCrochet * 2;
@@ -1072,6 +1178,7 @@ class OriginalChartingState extends MusicBeatState
 						songMusic.time += daTime;
 
 					vocals.time = songMusic.time;
+					oppvocals.time = songMusic.time;
 				}
 			}
 			if (FlxG.keys.justPressed.Z && curZoom > 0 && !FlxG.keys.pressed.CONTROL)
@@ -1175,6 +1282,7 @@ class OriginalChartingState extends MusicBeatState
 
 		songMusic.pause();
 		vocals.pause();
+		oppvocals.pause();
 		playedNote = [];
 		// Basically old shit from changeSection???
 		songMusic.time = sectionStartTime();
@@ -1186,6 +1294,7 @@ class OriginalChartingState extends MusicBeatState
 		}
 
 		vocals.time = songMusic.time;
+		oppvocals.time = songMusic.time;
 		updateCurStep();
 
 		updateGrid();
@@ -1207,6 +1316,7 @@ class OriginalChartingState extends MusicBeatState
 			{
 				songMusic.pause();
 				vocals.pause();
+				oppvocals.pause();
 				playedNote = [];
 
 				/*var daNum:Int = 0;
@@ -1219,6 +1329,7 @@ class OriginalChartingState extends MusicBeatState
 
 				songMusic.time = sectionStartTime();
 				vocals.time = songMusic.time;
+				oppvocals.time = songMusic.time;
 				updateCurStep();
 			}
 

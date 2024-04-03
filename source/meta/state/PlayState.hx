@@ -58,6 +58,7 @@ class PlayState extends MusicBeatState
 
 	public static var songMusic:FlxSound;
 	public static var vocals:FlxSound;
+	public static var oppvocals:FlxSound;
 
 	public static var campaignScore:Int = 0;
 
@@ -830,7 +831,7 @@ class PlayState extends MusicBeatState
 
 				// get the note ms timing
 				var noteDiff:Float = Math.abs(coolNote.strumTime - Conductor.songPosition);
-				trace(noteDiff);
+				
 				// get the timing
 				if (coolNote.strumTime < Conductor.songPosition)
 					ratingTiming = "late";
@@ -1349,6 +1350,10 @@ class PlayState extends MusicBeatState
 			vocals = new FlxSound().loadEmbedded(Sound.fromFile('./' + Paths.voices(SONG.song)), false, true);
 		else
 			vocals = new FlxSound();
+		if (SONG.needsoppVoices)
+			oppvocals = new FlxSound().loadEmbedded(Sound.fromFile('./' + Paths.oppvoices(SONG.song)), false, true);
+		else
+			oppvocals = new FlxSound();
 
 		FlxG.sound.list.add(songMusic);
 		FlxG.sound.list.add(vocals);
@@ -1490,6 +1495,7 @@ class PlayState extends MusicBeatState
 		canPause = false;
 		songMusic.volume = 0;
 		vocals.volume = 0;
+		oppvocals.volume = 0;
 		if (SONG.validScore)
 			Highscore.saveScore(SONG.song, songScore, storyDifficulty);
 

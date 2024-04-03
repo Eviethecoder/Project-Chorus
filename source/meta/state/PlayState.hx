@@ -1038,17 +1038,26 @@ class PlayState extends MusicBeatState
 	{
 		if (!Init.trueSettings.get('No Camera Note Movement'))
 		{
-			var camDisplaceExtend:Float = 1.5;
-			var camDisplaceSpeed = 0.0125;
+			var camDisplaceExtend:Float = 15;
 			if (PlayState.SONG.notes[Std.int(curStep / 16)] != null)
 			{
 				if ((PlayState.SONG.notes[Std.int(curStep / 16)].mustHitSection && mustHit)
 					|| (!PlayState.SONG.notes[Std.int(curStep / 16)].mustHitSection && !mustHit))
 				{
-					if ((cStrum.members[0].animation.curAnim.name == 'confirm') && (camDisplaceX > -camDisplaceExtend))
-						camDisplaceX -= camDisplaceSpeed;
-					else if ((cStrum.members[3].animation.curAnim.name == 'confirm') && (camDisplaceX < camDisplaceExtend))
-						camDisplaceX += camDisplaceSpeed;
+					camDisplaceX = 0;
+					if (cStrum.members[0].animation.curAnim.name == 'confirm')
+					{
+						camDisplaceX -= camDisplaceExtend;
+					}
+					if (cStrum.members[3].animation.curAnim.name == 'confirm')
+					{
+						camDisplaceX += camDisplaceExtend;
+					}
+					camDisplaceY = 0;
+					if (cStrum.members[1].animation.curAnim.name == 'confirm')
+						camDisplaceY += camDisplaceExtend;
+					if (cStrum.members[2].animation.curAnim.name == 'confirm')
+						camDisplaceY -= camDisplaceExtend;
 				}
 			}
 		}

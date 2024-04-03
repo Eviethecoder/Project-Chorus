@@ -20,6 +20,11 @@ class CoolUtil
 		return difficultyArray[number];
 	}
 
+	inline public static function boundTo(value:Float, min:Float, max:Float):Float
+	{
+		return Math.max(min, Math.min(max, value));
+	}
+
 	public static function dashToSpace(string:String):String
 	{
 		return string.replace("-", " ");

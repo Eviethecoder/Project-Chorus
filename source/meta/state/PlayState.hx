@@ -1048,6 +1048,7 @@ class PlayState extends MusicBeatState
 					if (cStrum.members[0].animation.curAnim.name == 'confirm')
 					{
 						camDisplaceX -= camDisplaceExtend;
+
 					}
 					if (cStrum.members[3].animation.curAnim.name == 'confirm')
 					{
@@ -1055,7 +1056,7 @@ class PlayState extends MusicBeatState
 					}
 					camDisplaceY = 0;
 					if (cStrum.members[1].animation.curAnim.name == 'confirm')
-						camDisplaceY += camDisplaceExtend;
+						camDisplaceY +=  camDisplaceExtend;
 					if (cStrum.members[2].animation.curAnim.name == 'confirm')
 						camDisplaceY -= camDisplaceExtend;
 				}

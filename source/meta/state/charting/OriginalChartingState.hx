@@ -129,6 +129,14 @@ class OriginalChartingState extends MusicBeatState
 		curSection = lastSection;
 
 		generateChartEditor();
+		waveformSprite = new FlxSprite(GRID_SIZE, 0).makeGraphic(FlxG.width, FlxG.height, 0x00FFFFFF);
+		add(waveformSprite);
+		#if desktop
+		if (FlxG.save.data.chart_waveformInst || FlxG.save.data.chart_waveformVoices)
+		{
+			updateWaveform();
+		}
+		#end
 
 		curRenderedNotes = new FlxTypedGroup<Note>();
 		curRenderedSustains = new FlxTypedGroup<FlxSprite>();
@@ -166,6 +174,7 @@ class OriginalChartingState extends MusicBeatState
 
 		FlxG.mouse.visible = true;
 		FlxG.save.bind('funkin', 'ninjamuffin99');
+		
 
 		tempBpm = _song.bpm;
 
@@ -531,14 +540,7 @@ class OriginalChartingState extends MusicBeatState
 		var gridBlackLine:FlxSprite = new FlxSprite(gridBG.x + gridBG.width / 2).makeGraphic(2, Std.int(gridBG.height), FlxColor.BLACK);
 
 		add(gridBlackLine);
-		waveformSprite = new FlxSprite(GRID_SIZE, 0).makeGraphic(FlxG.width, FlxG.height, 0x00FFFFFF);
-		add(waveformSprite);
-		#if desktop
-		if (FlxG.save.data.chart_waveformInst || FlxG.save.data.chart_waveformVoices)
-		{
-			updateWaveform();
-		}
-		#end
+		
 	}
 
 
@@ -890,16 +892,18 @@ class OriginalChartingState extends MusicBeatState
 
 		strumLine.y = getYfromStrum((Conductor.songPosition - sectionStartTime()) /zoomList[curZoom] %(Conductor.stepCrochet * _song.notes[curSection].lengthInSteps));
 
-		if (curBeat % 4 == 0 && curStep >= 16 * (curSection + 1))
+		if (Math.ceil(strumLine.y) >= gridBG.height)
 		{
-			
-
 			if (_song.notes[curSection + 1] == null)
 			{
 				addSection();
 			}
 
 			changeSection(curSection + 1, false);
+		}
+		else if (strumLine.y < -10)
+		{
+			changeSection(curSection - 1, false);
 		}
 
 		FlxG.watch.addQuick('daBeat', curBeat);
@@ -1000,15 +1004,13 @@ class OriginalChartingState extends MusicBeatState
 					songMusic.pause();
 					vocals.pause();
 					playedNote = [];
-					curRenderedNotes.forEachAlive(function(note:Note):Void
-					{
-						note.alpha = 1;
-					});
+					
 				}
 				else
 				{
 					vocals.play();
 					songMusic.play();
+					
 				}
 			}
 
@@ -1096,6 +1098,8 @@ class OriginalChartingState extends MusicBeatState
 			changeSection(curSection + shiftThing);
 		if (FlxG.keys.justPressed.LEFT || FlxG.keys.justPressed.A)
 			changeSection(curSection - shiftThing);
+
+
 
 		bpmTxt.text = bpmTxt.text = Std.string(FlxMath.roundDecimal(Conductor.songPosition / 1000, 2))
 			+ " / "
@@ -1421,6 +1425,10 @@ class OriginalChartingState extends MusicBeatState
 		updateGrid();
 	}
 
+	function strumLineUpdateY()
+	{
+		strumLine.y = getYfromStrum((Conductor.songPosition - sectionStartTime()) / zoomList[curZoom] % (Conductor.stepCrochet * 16)) / (getSectionBeats() / 4);
+	}
 	function clearSection():Void
 	{
 		_song.notes[curSection].sectionNotes = [];

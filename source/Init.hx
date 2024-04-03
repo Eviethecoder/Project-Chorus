@@ -64,6 +64,13 @@ class Init extends FlxState
 			'Whether to reduce movements, like icons bouncing or beat zooms in gameplay.',
 			NOT_FORCED
 		],
+		'Counter' => [
+			'None',
+			Selector,
+			'Choose whether you want somewhere to display your judgements, and where you want it.',
+			NOT_FORCED,
+			['None', 'Left', 'Right']
+		],
 		'Stage Darkness' => [
 			Checkmark,
 			Selector,

@@ -197,6 +197,7 @@ class PlayState extends MusicBeatState
 		// determine the chart type here
 		determinedChartType = "FNF";
 
+		
 		//
 
 		// set up a class for the stage type in here afterwards
@@ -690,7 +691,8 @@ class PlayState extends MusicBeatState
 						if ((daNote.tooLate || !daNote.wasGoodHit) && (daNote.mustPress))
 						{
 							vocals.volume = 0;
-							missNoteCheck((Init.trueSettings.get('Ghost Tapping')) ? true : false, daNote.noteData, boyfriend, true, daNote);
+							
+							missNoteCheck((Init.trueSettings.get('Ghost Tapping')) ? true : false, daNote.noteData, boyfriend, true, 0 );
 							// ambiguous name
 							Timings.updateAccuracy(0);
 						}
@@ -761,7 +763,7 @@ class PlayState extends MusicBeatState
 						}
 						else // else just call bad notes
 							if (!Init.trueSettings.get('Ghost Tapping'))
-								missNoteCheck(true, i, character, true);
+								missNoteCheck(true, i, character, true, 0);
 					}
 					//
 				}
@@ -875,17 +877,23 @@ class PlayState extends MusicBeatState
 		}
 	}
 
-	function missNoteCheck(?includeAnimation:Bool = false, direction:Int = 0, character:Character, popMiss:Bool = false, lockMiss:Bool = false, ?note:Note)
+	function missNoteCheck(?includeAnimation:Bool = false, direction:Int = 0, character:Character, popMiss:Bool = false, lockMiss:Bool = false, ?noteType:Float)
 	{
 
-		trace(note.noteType);
 		
-		if (includeAnimation && note.noteType != 1)
+		if (includeAnimation )
 		{
-			var stringDirection:String = UIStaticArrow.getArrowFromNumber(direction);
+			if (noteType == 1){
 
-			FlxG.sound.play(Paths.soundRandom('missnote', 1, 3), FlxG.random.float(0.1, 0.2));
-			character.playAnim('sing' + stringDirection.toUpperCase() + 'miss', lockMiss);
+			}
+			else
+			{
+				var stringDirection:String = UIStaticArrow.getArrowFromNumber(direction);
+
+				FlxG.sound.play(Paths.soundRandom('missnote', 1, 3), FlxG.random.float(0.1, 0.2));
+				character.playAnim('sing' + stringDirection.toUpperCase() + 'miss', lockMiss);
+			}
+			
 		}
 		decreaseCombo(popMiss);
 
@@ -1209,7 +1217,7 @@ class PlayState extends MusicBeatState
 				combo += 1;
 			}
 			else
-				missNoteCheck(true, direction, character, false, true, type);
+				missNoteCheck(true, direction, character, false, true, type.noteType);
 		}
 	}
 

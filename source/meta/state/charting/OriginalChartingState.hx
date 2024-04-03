@@ -1000,6 +1000,10 @@ class OriginalChartingState extends MusicBeatState
 					songMusic.pause();
 					vocals.pause();
 					playedNote = [];
+					curRenderedNotes.forEachAlive(function(note:Note):Void
+					{
+						note.alpha = 1;
+					});
 				}
 				else
 				{
@@ -1339,17 +1343,16 @@ class OriginalChartingState extends MusicBeatState
 
 			if (daSus > 0)
 				curRenderedSustains.add(setupSusNote(note));
-			// if (daNoteType != 0)
-			// {
-				
-			// 	var noteTypeNum:AbsoluteText = new AbsoluteText(100, $daNoteType );
-			// 	noteTypeNum.setFormat(24);
-			// 	noteTypeNum.offsetX = -32;
-			// 	noteTypeNum.offsetY = 6;
-			// 	noteTypeNum.borderSize = 1;
-			// 	curRenderedTexts.add(noteTypeNum);
-			// 	noteTypeNum.parent = note;
-			// }
+			if (daNoteType != 0)
+			{
+				// var noteTypeNum:AbsoluteText = new AbsoluteText(100, "" + Std.string(daNoteType));
+				// noteTypeNum.setFormat(24);
+				// noteTypeNum.offsetX = -32;
+				// noteTypeNum.offsetY = 6;
+				// noteTypeNum.borderSize = 1;
+				// curRenderedTexts.add(noteTypeNum);
+				// noteTypeNum.parent = note;
+			}
 			note.mustPress = _song.notes[curSection].mustHitSection;
 			updateWaveform();
 			if (i[1] > 3)

@@ -439,7 +439,20 @@ class PlayState extends MusicBeatState
 				{
 					Main.switchState(this, new OriginalChartingState());
 				}
+				if (FlxG.keys.justPressed.EIGHT)
+				{
+					/* 	 8 for opponent char
+									   SHIFT+8 for player char
+						CTRL+SHIFT+8 for gf */
+					if (FlxG.keys.pressed.SHIFT)
+						if (FlxG.keys.pressed.CONTROL)
+							FlxG.switchState(new AnimationDebug(gf.curCharacter));
+						else
+							FlxG.switchState(new AnimationDebug(SONG.player1));
+					else
+						FlxG.switchState(new AnimationDebug(SONG.player2));
 			}
+		}
 
 			///*
 			if (startingSong)
@@ -530,7 +543,7 @@ class PlayState extends MusicBeatState
 							getCenterY = char.getMidpoint().y - 200;
 					}
 
-					camFollow.setPosition(getCenterX + (camDisplaceX * 8), getCenterY);
+					camFollow.setPosition(getCenterX + (camDisplaceX * 8), getCenterY + (camDisplaceY * 8));
 
 					/*
 						if (SONG.song.toLowerCase() == 'tutorial')

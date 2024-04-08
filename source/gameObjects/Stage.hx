@@ -13,9 +13,11 @@ import flixel.math.FlxPoint;
 import flixel.system.FlxSound;
 import flixel.text.FlxText;
 import flixel.tweens.FlxTween;
+import flixel.util.FlxColor;
 import gameObjects.background.*;
 import meta.CoolUtil;
 import meta.data.Conductor;
+import meta.data.WiggleEffect;
 import meta.data.dependency.FNFSprite;
 import meta.state.PlayState;
 
@@ -34,6 +36,7 @@ class Stage extends FlxTypedGroup<FlxBasic>
 	var trainSound:FlxSound;
 
 	public var limo:FNFSprite;
+	public var overlay:FNFSprite;
 
 	public var grpLimoDancers:FlxTypedGroup<BackgroundDancer>;
 
@@ -46,6 +49,9 @@ class Stage extends FlxTypedGroup<FlxBasic>
 	var bgGirls:BackgroundGirls;
 
 	public var curStage:String;
+	public var sbg:FNFSprite;
+	public var whiteShit:FlxSprite;
+	public var wiggle:WiggleEffect;
 
 	var daPixelZoom = PlayState.daPixelZoom;
 
@@ -77,6 +83,8 @@ class Stage extends FlxTypedGroup<FlxBasic>
 					curStage = 'school';
 				case 'thorns':
 					curStage = 'schoolEvil';
+				case 'lovely-sound':
+					curStage = 'Spotlight';
 				default:
 					curStage = 'stage';
 			}
@@ -334,6 +342,32 @@ class Stage extends FlxTypedGroup<FlxBasic>
 				bg.scrollFactor.set(0.8, 0.9);
 				bg.scale.set(6, 6);
 				add(bg);
+			case 'Spotlight':
+				
+				// sheddar = new FlxRuntimeShader(Paths.getTextFromFile('shader/rgbeffect3.frag', false));
+				// FlxG.camera.setFilters([new ShaderFilter(sheddar)]);
+				// camHUD.setFilters([new ShaderFilter(sheddar)]);
+				// // rgb = new RGBPalette();
+				// // FlxG.camera.setFilters([new ShaderFilter(rgb)]);
+
+				sbg = new FNFSprite(-200, -100).loadGraphic(Paths.image('backgrounds/Spotlight/base'));
+				
+				sbg.scrollFactor.set(0.9, 0.9);
+				sbg.setGraphicSize(Std.int(sbg.width * 2));
+				add(sbg);
+				overlay = new FNFSprite( -200, -100).loadGraphic(Paths.image('backgrounds/Spotlight/overlay'));
+				overlay.setGraphicSize(Std.int(overlay.width * 2));
+				overlay.scrollFactor.set(0.9, 0.9);
+				
+				whiteShit = new FlxSprite(-FlxG.width * FlxG.camera.zoom,
+					-FlxG.height * FlxG.camera.zoom + 300).makeGraphic(FlxG.width * 5, FlxG.height * 9, FlxColor.WHITE);
+				whiteShit.scrollFactor.set();
+				whiteShit.alpha = 0;
+				add(whiteShit);
+				PlayState.defaultCamZoom = 0.95;
+
+			
+
 
 			default:
 				PlayState.defaultCamZoom = 0.9;
@@ -448,6 +482,12 @@ class Stage extends FlxTypedGroup<FlxBasic>
 
 			case 'mall':
 				boyfriend.x += 200;
+			case 'Spotlight':
+				boyfriend.x += 470;
+				boyfriend.y += -200;
+				dad.y == -100;
+				gf.y == -100;
+				dad.x == 0;
 
 			case 'mallEvil':
 				boyfriend.x += 320;
@@ -497,6 +537,8 @@ class Stage extends FlxTypedGroup<FlxBasic>
 				upperBoppers.animation.play('bop', true);
 				bottomBoppers.animation.play('bop', true);
 				santa.animation.play('idle', true);
+
+			
 
 			case 'school':
 				bgGirls.dance();

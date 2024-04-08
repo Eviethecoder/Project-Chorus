@@ -5,6 +5,7 @@ package;
  */
 import flixel.FlxG;
 import flixel.graphics.frames.FlxAtlasFrames;
+import lime.utils.Assets;
 import meta.CoolUtil;
 import openfl.utils.AssetType;
 import openfl.utils.Assets as OpenFlAssets;
@@ -177,9 +178,10 @@ class Paths
 		}
 		return getPath(voicePath, MUSIC, null);
 	}
+
 	inline static public function oppvoices(song:String)
 	{
-		var voicePath = 'songs/${song.toLowerCase()}/Voices.$SOUND_EXT';
+			var voicePath = 'songs/${song.toLowerCase()}/dad-Voices.$SOUND_EXT';
 		if (!FileSystem.exists(getPath(voicePath, MUSIC, null)))
 		{
 			voicePath = 'songs/${CoolUtil.swapSpaceDash(song.toLowerCase())}/dad-Voices.$SOUND_EXT';

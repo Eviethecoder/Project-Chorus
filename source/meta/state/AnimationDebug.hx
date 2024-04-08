@@ -32,7 +32,7 @@ class AnimationDebug extends FlxState
 	var daAnim:String = 'spooky';
 	var camFollow:FlxObject;
 
-	public function new(daAnim:String = 'spooky')
+	public function new(daAnim:String = 'spooky', ?isDad:Bool = true)
 	{
 		super();
 		this.daAnim = daAnim;
@@ -46,7 +46,7 @@ class AnimationDebug extends FlxState
 		gridBG.scrollFactor.set(0.5, 0.5);
 		add(gridBG);
 
-		if (daAnim == 'archie')
+		if (daAnim == 'bf' || daAnim == 'Archie')
 			isDad = false;
 
 		if (isDad)
@@ -61,7 +61,7 @@ class AnimationDebug extends FlxState
 		}
 		else
 		{
-			bf = new Boyfriend(0, 0);
+			bf = new Boyfriend(0, 0, daAnim);
 			bf.screenCenter();
 			bf.debugMode = true;
 			add(bf);
@@ -91,7 +91,7 @@ class AnimationDebug extends FlxState
 
 	function genBoyOffsets(pushList:Bool = true):Void
 	{
-		var daLoop:Int = 100;
+		var daLoop:Int = 0;
 
 		for (anim => offsets in char.animOffsets)
 		{
@@ -208,6 +208,7 @@ class AnimationDebug extends FlxState
 
 			outputString.trim();
 			saveOffsets(outputString);
+			FlxG.switchState(new PlayState());
 		}
 
 		super.update(elapsed);

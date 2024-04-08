@@ -25,6 +25,7 @@ typedef CharacterData =
 	var camOffsetY:Float;
 	var quickDancer:Bool;
 	var iconoveride:String;
+	var singDuration:Float;
 	var healthbarColors:Array<Int>;
 }
 
@@ -38,6 +39,7 @@ class Character extends FNFSprite
 
 	public var isPlayer:Bool = false;
 	public var curCharacter:String = 'bf';
+
 
 	public var holdTimer:Float = 0;
 
@@ -63,6 +65,7 @@ class Character extends FNFSprite
 			camOffsetY: 0,
 			camOffsetX: 0,
 			quickDancer: false,
+			singDuration:4,
 			iconoveride: curCharacter,
 			healthbarColors: [165, 0, 77]
 		};
@@ -172,6 +175,8 @@ class Character extends FNFSprite
 				playAnim('idle');
 
 				characterData.healthbarColors = [87, 80, 163];
+				characterData.singDuration = 3;
+				scale.set(1.2, 1.2);
 			case 'spooky':
 				tex = Paths.getSparrowAtlas('characters/spooky_kids_assets');
 				frames = tex;
@@ -313,6 +318,8 @@ class Character extends FNFSprite
 
 				characterData.healthbarColors = [68, 3, 28];
 				flipX = true;
+				characterData.singDuration = 5;
+				scale.set(1.5, 1.5);
 			
 			/*
 				case 'bf-og':
@@ -636,8 +643,8 @@ class Character extends FNFSprite
 				holdTimer += elapsed;
 			}
 
-			var dadVar:Float = 4;
-			if (holdTimer >= Conductor.stepCrochet * dadVar * 0.001)
+			var singDuration:Float = 4;
+			if (holdTimer >= Conductor.stepCrochet * characterData.singDuration * 0.001)
 			{
 				dance();
 				holdTimer = 0;

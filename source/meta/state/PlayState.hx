@@ -29,6 +29,7 @@ import meta.*;
 import meta.MusicBeat.MusicBeatState;
 import meta.data.*;
 import meta.data.Song.SwagSong;
+import meta.data.WiggleEffect;
 import meta.state.charting.*;
 import meta.state.menus.*;
 import meta.subState.*;
@@ -59,6 +60,7 @@ class PlayState extends MusicBeatState
 	public static var songMusic:FlxSound;
 	public static var vocals:FlxSound;
 	public static var oppvocals:FlxSound;
+	public var wiggle:WiggleEffect;
 
 	public static var campaignScore:Int = 0;
 
@@ -66,6 +68,7 @@ class PlayState extends MusicBeatState
 	public static var gf:Character;
 	public static var boyfriend:Boyfriend;
 
+	public var rgb:FlxRuntimeShader;
 	public static var assetModifier:String = 'base';
 	public static var changeableSkin:String = 'default';
 
@@ -201,12 +204,13 @@ class PlayState extends MusicBeatState
 		
 		//
 
+		trace(SONG.stage);
+		trace(SONG.song);
 		// set up a class for the stage type in here afterwards
 		curStage = "";
 		// call the song's stage if it exists
-		if (SONG.stage != null)
+		if (SONG.stage != null )
 			curStage = SONG.stage;
-
 		// cache ratings LOL
 		displayRating('sick', 'early', true);
 		popUpCombo(true);
@@ -224,6 +228,18 @@ class PlayState extends MusicBeatState
 			so I don't really know what I'm doing, I'm just hoping I can make a better and more optimised 
 			engine for both myself and other modders to use!
 		 */
+		 if(curStage =='Spotlight' ){
+			// wiggle = new WiggleEffect();
+			// wiggle.effectType = WiggleEffectType.DREAMY;
+			// wiggle.waveAmplitude = 0.01; // love when shader code
+			// wiggle.waveFrequency = 7;
+			// wiggle.waveSpeed = 1;
+			// stageBuild.sbg.shader = wiggle.shader;
+			// stageBuild.overlay.shader = wiggle.shader;
+			rgb = new FlxRuntimeShader(File.getContent('shader/rgbeffect3.frag'));
+			FlxG.camera.setFilters([new ShaderFilter(rgb)]);
+			camHUD.setFilters([new ShaderFilter(rgb)]);
+		 }
 
 		// set up characters here too
 		gf = new Character(400, 130, stageBuild.returnGFtype(curStage));
@@ -257,9 +273,14 @@ class PlayState extends MusicBeatState
 		// add limo cus dumb layering
 		if (curStage == 'highway')
 			add(stageBuild.limo);
+		
 
 		add(dadOpponent);
 		add(boyfriend);
+		if (curStage == 'Spotlight')
+		{
+			add(stageBuild.overlay);
+		}
 
 		add(stageBuild.foreground);
 
@@ -378,10 +399,8 @@ class PlayState extends MusicBeatState
 
 		// Uncomment the code below to apply the effect
 
-		/*
-		var shader:GraphicsShader = new GraphicsShader("", File.getContent("./assets/shaders/vhs.frag"));
-		FlxG.camera.setFilters([new ShaderFilter(shader)]);
-		*/
+	
+		
 	}
 
 	var staticDisplace:Int = 0;
@@ -389,8 +408,50 @@ class PlayState extends MusicBeatState
 	override public function update(elapsed:Float)
 	{
 		stageBuild.stageUpdateConstant(elapsed, boyfriend, gf, dadOpponent);
+		if (curStage == 'Spotlight'){
+			//wiggle.update(elapsed);
+			rgb.setFloat('iTime', Sys.cpuTime() * elapsed);
+			rgb.setFloat("time", Sys.cpuTime() * elapsed);
+		}
 
 		super.update(elapsed);
+		if (SONG.song == 'Lovely-sound')
+		{
+			switch (curBeat)
+			{
+				case(-5):
+					dadOpponent.alpha = 0;
+					gf.alpha = 0; // shes stalking boyfriend
+					uiHUD.iconP2.alpha = 0;
+					
+
+				case(46):
+					
+					camFollow.setPosition(dadOpponent.getMidpoint().x, dadOpponent.getMidpoint().y);
+					FlxTween.tween(dadOpponent, {alpha: 1.0}, 0.9, {ease: FlxEase.cubeInOut});
+					FlxTween.tween(uiHUD.iconP2, {alpha: 1.0}, 0.9, {ease: FlxEase.cubeInOut});
+					FlxTween.tween(FlxG.camera, {zoom: 0.65}, 1.9, {
+						ease: FlxEase.linear,
+						onComplete: function(twn:FlxTween)
+						{
+							//healthBar.leftBar.color = FlxColor.fromRGB(dadOpponent.healthColorArray[0], dadOpponent.healthColorArray[1], dadOpponent.healthColorArray[2]);
+							defaultCamZoom = 0.65;
+						}
+					});
+				case(303):
+					
+					camFollow.setPosition(boyfriend.getMidpoint().x, boyfriend.getMidpoint().y);
+					FlxTween.tween(FlxG.camera, {zoom: 0.95}, 2.9, {
+						ease: FlxEase.linear,
+						onComplete: function(twn:FlxTween)
+						{
+							//healthBar.leftBar.color = FlxColor.fromRGB(dadOpponent.healthColorArray[0], dadOpponent.healthColorArray[1], dadOpponent.healthColorArray[2]);
+							defaultCamZoom = 0.95;
+							camFollow.setPosition(dadOpponent.getMidpoint().x, dadOpponent.getMidpoint().y);
+						}
+					});
+				}
+			}
 
 		FlxG.camera.followLerp = elapsed * 2;
 
@@ -446,9 +507,9 @@ class PlayState extends MusicBeatState
 						CTRL+SHIFT+8 for gf */
 					if (FlxG.keys.pressed.SHIFT)
 						if (FlxG.keys.pressed.CONTROL)
-							FlxG.switchState(new AnimationDebug(gf.curCharacter));
+							FlxG.switchState(new AnimationDebug(gf.curCharacter,false));
 						else
-							FlxG.switchState(new AnimationDebug(SONG.player1));
+							FlxG.switchState(new AnimationDebug(SONG.player1,false));
 					else
 						FlxG.switchState(new AnimationDebug(SONG.player2));
 			}
@@ -497,8 +558,22 @@ class PlayState extends MusicBeatState
 				{
 					var char = dadOpponent;
 
+					if (SONG.song == 'Lovely-sound'
+						&& curBeat >= 207
+						&& curBeat <= 240
+						|| SONG.song == 'Lovely-sound'
+						&& curBeat >= 319)
+					{
+						camFollow.setPosition(gf.getMidpoint().x, gf.getMidpoint().y);
+					}
+					
+					
+					
+
 					var getCenterX = char.getMidpoint().x + 150;
 					var getCenterY = char.getMidpoint().y - 100;
+					
+					
 					switch (dadOpponent.curCharacter)
 					{
 						case 'mom':
@@ -511,7 +586,17 @@ class PlayState extends MusicBeatState
 							getCenterX = char.getMidpoint().x - 100;
 					}
 
-					camFollow.setPosition(getCenterX + (camDisplaceX * 8), getCenterY + (camDisplaceY * 8));
+					if (SONG.song == 'Lovely-sound' && curBeat >= 207 && curBeat <= 240|| SONG.song == 'Lovely-sound'&& curBeat >= 319)
+					{
+
+						camFollow.setPosition(gf.getMidpoint().x, gf.getMidpoint().y);
+
+					}
+					else{
+						camFollow.setPosition(getCenterX + (camDisplaceX * 8), getCenterY + (camDisplaceY * 8));
+					}
+
+					
 
 					if (char.curCharacter == 'mom')
 						vocals.volume = 1;
@@ -527,6 +612,11 @@ class PlayState extends MusicBeatState
 				{
 					var char = boyfriend;
 
+					if (SONG.song == 'Lovely-sound'&& curBeat >= 207 && curBeat <= 240|| SONG.song == 'Lovely-sound'&& curBeat >= 319)
+					{
+						camFollow.setPosition(gf.getMidpoint().x, gf.getMidpoint().y);
+						
+					}
 					var getCenterX = char.getMidpoint().x - 100;
 					var getCenterY = char.getMidpoint().y - 100;
 					switch (curStage)
@@ -543,7 +633,16 @@ class PlayState extends MusicBeatState
 							getCenterY = char.getMidpoint().y - 200;
 					}
 
-					camFollow.setPosition(getCenterX + (camDisplaceX * 8), getCenterY + (camDisplaceY * 8));
+					if (SONG.song == 'lovely-sound'&& curBeat >= 207 && curBeat <= 240|| SONG.song == 'Lovely-sound'&& curBeat >= 319 )
+					{
+
+						camFollow.setPosition(gf.getMidpoint().x, gf.getMidpoint().y);
+					}
+					else
+					{
+						camFollow.setPosition(getCenterX + (camDisplaceX * 8), getCenterY + (camDisplaceY * 8));
+					}
+
 
 					/*
 						if (SONG.song.toLowerCase() == 'tutorial')
@@ -1324,6 +1423,7 @@ class PlayState extends MusicBeatState
 			songMusic.play();
 			songMusic.onComplete = endSong;
 			vocals.play();
+			oppvocals.play();
 
 			resyncVocals();
 
@@ -1367,9 +1467,10 @@ class PlayState extends MusicBeatState
 			oppvocals = new FlxSound().loadEmbedded(Sound.fromFile('./' + Paths.oppvoices(SONG.song)), false, true);
 		else
 			oppvocals = new FlxSound();
-
+		
 		FlxG.sound.list.add(songMusic);
 		FlxG.sound.list.add(vocals);
+		FlxG.sound.list.add(oppvocals);
 
 		// generate the chart
 		unspawnNotes = ChartLoader.generateChartType(SONG, determinedChartType);
@@ -1389,11 +1490,13 @@ class PlayState extends MusicBeatState
 	function resyncVocals():Void
 	{
 		vocals.pause();
-
+		oppvocals.pause();
 		songMusic.play();
 		Conductor.songPosition = songMusic.time;
 		vocals.time = Conductor.songPosition;
+		oppvocals.time = Conductor.songPosition;
 		vocals.play();
+		oppvocals.play();
 	}
 
 	override function stepHit()
@@ -1451,9 +1554,13 @@ class PlayState extends MusicBeatState
 		if (songMusic != null)
 			songMusic.stop();
 
-		if (vocals != null)
+		if (vocals != null){
 			vocals.stop();
+		}
+		if (oppvocals != null){
+			oppvocals.stop();
 	}
+}
 
 	override function openSubState(SubState:FlxSubState)
 	{
@@ -1465,6 +1572,7 @@ class PlayState extends MusicBeatState
 				//	trace('nulled song');
 				songMusic.pause();
 				vocals.pause();
+				oppvocals.pause();
 				//	trace('nulled song finished');
 			}
 
@@ -1718,6 +1826,8 @@ class PlayState extends MusicBeatState
 
 		return false;
 	}
+
+	
 
 	public static var swagCounter:Int = 0;
 

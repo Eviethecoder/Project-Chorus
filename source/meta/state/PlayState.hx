@@ -228,7 +228,7 @@ class PlayState extends MusicBeatState
 			so I don't really know what I'm doing, I'm just hoping I can make a better and more optimised 
 			engine for both myself and other modders to use!
 		 */
-		 if(curStage =='Spotlight' ){
+		/* if(curStage =='Spotlight' ){
 			// wiggle = new WiggleEffect();
 			// wiggle.effectType = WiggleEffectType.DREAMY;
 			// wiggle.waveAmplitude = 0.01; // love when shader code
@@ -239,7 +239,7 @@ class PlayState extends MusicBeatState
 			rgb = new FlxRuntimeShader(File.getContent('shader/rgbeffect3.frag'));
 			FlxG.camera.setFilters([new ShaderFilter(rgb)]);
 			camHUD.setFilters([new ShaderFilter(rgb)]);
-		 }
+		 }*/
 
 		// set up characters here too
 		gf = new Character(400, 130, stageBuild.returnGFtype(curStage));
@@ -408,11 +408,11 @@ class PlayState extends MusicBeatState
 	override public function update(elapsed:Float)
 	{
 		stageBuild.stageUpdateConstant(elapsed, boyfriend, gf, dadOpponent);
-		if (curStage == 'Spotlight'){
+		/*if (curStage == 'Spotlight'){
 			//wiggle.update(elapsed);
 			rgb.setFloat('iTime', Sys.cpuTime() * elapsed);
 			rgb.setFloat("time", Sys.cpuTime() * elapsed);
-		}
+		}*/
 
 		super.update(elapsed);
 		if (SONG.song == 'Lovely-sound')
@@ -1151,7 +1151,7 @@ class PlayState extends MusicBeatState
 	{
 		if (!Init.trueSettings.get('No Camera Note Movement'))
 		{
-			var camDisplaceExtend:Float = 7;
+			var camDisplaceExtend:Float = 3.5;
 			if (PlayState.SONG.notes[Std.int(curStep / 16)] != null)
 			{
 				if ((PlayState.SONG.notes[Std.int(curStep / 16)].mustHitSection && mustHit)
@@ -1161,11 +1161,13 @@ class PlayState extends MusicBeatState
 					if (cStrum.members[0].animation.curAnim.name == 'confirm')
 					{
 						camDisplaceX -= camDisplaceExtend;
+						camGame.angle -= 0.0025;
 
 					}
 					if (cStrum.members[3].animation.curAnim.name == 'confirm')
 					{
 						camDisplaceX += camDisplaceExtend;
+						camGame.angle += 0.0025;
 					}
 					camDisplaceY = 0;
 					if (cStrum.members[1].animation.curAnim.name == 'confirm')

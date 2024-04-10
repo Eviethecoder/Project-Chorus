@@ -1,5 +1,5 @@
 package meta.state;
-
+import Events;
 import flixel.FlxBasic;
 import flixel.FlxCamera;
 import flixel.FlxG;
@@ -9,6 +9,7 @@ import flixel.FlxState;
 import flixel.FlxSubState;
 import flixel.addons.effects.FlxTrail;
 import flixel.addons.transition.FlxTransitionableState;
+import flixel.graphics.tile.FlxRuntimeShader;
 import flixel.group.FlxGroup.FlxTypedGroup;
 import flixel.math.FlxMath;
 import flixel.math.FlxPoint;
@@ -38,6 +39,7 @@ import openfl.events.KeyboardEvent;
 import openfl.filters.ShaderFilter;
 import openfl.media.Sound;
 import openfl.utils.Assets;
+// import shaders.ShaderObject;
 import sys.io.File;
 
 using StringTools;
@@ -48,6 +50,7 @@ import meta.data.dependency.Discord;
 
 class PlayState extends MusicBeatState
 {
+	public static var instance:PlayState;
 	public static var startTimer:FlxTimer;
 
 	public static var curStage:String = '';
@@ -68,7 +71,6 @@ class PlayState extends MusicBeatState
 	public static var gf:Character;
 	public static var boyfriend:Boyfriend;
 
-	public var rgb:FlxRuntimeShader;
 	public static var assetModifier:String = 'base';
 	public static var changeableSkin:String = 'default';
 
@@ -121,6 +123,9 @@ class PlayState extends MusicBeatState
 
 	public static var defaultCamZoom:Float = 1.05;
 
+	//epic event system!
+	var eventHandler:Events;
+
 	public static var forceZoom:Array<Float>;
 
 	public static var songScore:Int = 0;
@@ -151,7 +156,6 @@ class PlayState extends MusicBeatState
 	public static var lastRating:FlxSprite;
 	// stores the last combo objects in an array
 	public static var lastCombo:Array<FlxSprite>;
-
 	// at the beginning of the playstate
 	override public function create()
 	{
@@ -228,18 +232,9 @@ class PlayState extends MusicBeatState
 			so I don't really know what I'm doing, I'm just hoping I can make a better and more optimised 
 			engine for both myself and other modders to use!
 		 */
-		/* if(curStage =='Spotlight' ){
-			// wiggle = new WiggleEffect();
-			// wiggle.effectType = WiggleEffectType.DREAMY;
-			// wiggle.waveAmplitude = 0.01; // love when shader code
-			// wiggle.waveFrequency = 7;
-			// wiggle.waveSpeed = 1;
-			// stageBuild.sbg.shader = wiggle.shader;
-			// stageBuild.overlay.shader = wiggle.shader;
-			rgb = new FlxRuntimeShader(File.getContent('shader/rgbeffect3.frag'));
-			FlxG.camera.setFilters([new ShaderFilter(rgb)]);
-			camHUD.setFilters([new ShaderFilter(rgb)]);
-		 }*/
+		if(curStage =='Spotlight' ){
+
+		 }
 
 		// set up characters here too
 		gf = new Character(400, 130, stageBuild.returnGFtype(curStage));
@@ -319,6 +314,8 @@ class PlayState extends MusicBeatState
 
 		add(camFollow);
 
+		eventHandler = new Events(SONG.song);
+
 		// actually set the camera up
 		var camLerp = Main.framerateAdjust(0.04);
 		FlxG.camera.follow(camFollow, LOCKON, camLerp);
@@ -372,34 +369,6 @@ class PlayState extends MusicBeatState
 			songIntroCutscene();
 		else 
 			startCountdown();
-
-		/**
-		 * SHADERS
-		 * 
-		 * This is a highly experimental code by gedehari to support runtime shader parsing.
-		 * Usually, to add a shader, you would make it a class, but now, I modified it so
-		 * you can parse it from a file.
-		 * 
-		 * This feature is planned to be used for modcharts
-		 * (at this time of writing, it's not available yet).
-		 * 
-		 * This example below shows that you can apply shaders as a FlxCamera filter.
-		 * the GraphicsShader class accepts two arguments, one is for vertex shader, and
-		 * the second is for fragment shader.
-		 * Pass in an empty string to use the default vertex/fragment shader.
-		 * 
-		 * Next, the Shader is passed to a new instance of ShaderFilter, neccesary to make
-		 * the filter work. And that's it!
-		 * 
-		 * To access shader uniforms, just reference the `data` property of the GraphicsShader
-		 * instance.
-		 * 
-		 * Thank you for reading! -gedehari
-		 */
-
-		// Uncomment the code below to apply the effect
-
-	
 		
 	}
 

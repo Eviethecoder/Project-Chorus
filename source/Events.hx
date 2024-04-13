@@ -1,5 +1,6 @@
 package;
 
+import Shaders;
 import flixel.FlxBasic;
 import flixel.FlxG;
 import flixel.FlxSprite;
@@ -14,15 +15,20 @@ import flixel.util.FlxTimer;
 import lime.app.Application;
 import meta.state.PlayState;
 import openfl.display.GraphicsShader;
+import openfl.filters.BitmapFilter;
 import openfl.filters.ShaderFilter;
 
 class Events
 {
-	var rgb:FlxRuntimeShader;
 	var songName:String;
+
+	public static var shaders:Array<ShaderEffect> = [];
+	public static var shaderUpdate:Array<Float->Void> = [];
 
 	var step:Int;
 	var beat:Int;
+
+	var daShader:ChromaticAberrationEffect;
 
 	// events vars!
 
@@ -33,8 +39,10 @@ class Events
 		switch (songName)
 		{
 			case "Lovely-sound":
-				// rgb = new FlxRuntimeShader(Paths.shaderFragment('vhs'));
-				// PlayState.camGame.setFilters([new ShaderFilter(rgb)]);
+				daShader = new ChromaticAberrationEffect(0.0025);
+				addShader(daShader);
+
+
 		}
 	}
 
@@ -52,6 +60,10 @@ class Events
 
 	public function onUpdate(elapsed:Float)
 	{
+		for (i in shaderUpdate)
+		{
+			i(elapsed);
+		}
 		switch (songName) {}
 	}
 
@@ -85,5 +97,32 @@ class Events
 	{
 		var index = PlayState.instance.members.indexOf(Obj);
 		PlayState.instance.members[index] = null;
+	}
+
+	function addShader(effect:ShaderEffect) // IMPORTANTE!1!1!!
+	{
+		if (shaders.contains(effect))
+		{
+			return;
+		}
+
+		shaders.push(effect);
+
+		var newCamEffects:Array<BitmapFilter> = [];
+
+		for (i in shaders)
+		{
+			newCamEffects.push(new ShaderFilter(i.shader));
+		}
+
+		FlxG.camera.setFilters(newCamEffects);
+		PlayState.camHUD.setFilters(newCamEffects);
+	}
+
+	function clearShaders() // IMPORTANTE!1!1!!
+	{
+		FlxG.camera.setFilters([]);
+
+		shaders = [];
 	}
 }

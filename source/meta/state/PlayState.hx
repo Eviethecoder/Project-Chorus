@@ -1,5 +1,6 @@
 package meta.state;
 import Events;
+import Shaders;
 import flixel.FlxBasic;
 import flixel.FlxCamera;
 import flixel.FlxG;
@@ -7,7 +8,6 @@ import flixel.FlxObject;
 import flixel.FlxSprite;
 import flixel.FlxState;
 import flixel.FlxSubState;
-import flixel.addons.display.FlxRuntimeShader;
 import flixel.addons.effects.FlxTrail;
 import flixel.addons.transition.FlxTransitionableState;
 import flixel.group.FlxGroup.FlxTypedGroup;
@@ -38,6 +38,7 @@ import meta.state.menus.*;
 import meta.subState.*;
 import openfl.display.GraphicsShader;
 import openfl.events.KeyboardEvent;
+import openfl.filters.BitmapFilter;
 import openfl.filters.ShaderFilter;
 import openfl.media.Sound;
 import openfl.utils.Assets;
@@ -160,6 +161,16 @@ class PlayState extends MusicBeatState
 	// stores the last combo objects in an array
 	public static var lastCombo:Array<FlxSprite>;
 	// at the beginning of the playstate
+
+	public var shaderUpdates:Array<Float->Void> = [];
+	public var camGameShaders:Array<ShaderEffect> = [];
+	public var camHUDShaders:Array<ShaderEffect> = [];
+	public var dialogueHUDShaders:Array<ShaderEffect> = [];
+
+
+	public static var shaders:Array<ShaderEffect> = [];
+	public static var shaderUpdate:Array<Float->Void> = [];
+
 	override public function create()
 	{
 		super.create();
@@ -198,7 +209,7 @@ class PlayState extends MusicBeatState
 		FlxG.cameras.add(camHUD);
 	
 		allUIs.push(camHUD);
-		FlxG.cameras.setDefaultDrawTarget(camGame, true);
+		FlxCamera.defaultCameras = [camGame];
 
 		// default song
 		if (SONG == null)
@@ -280,13 +291,13 @@ class PlayState extends MusicBeatState
 
 		add(dadOpponent);
 		add(boyfriend);
-		if (curStage == 'Spotlight')
+		/*if (curStage == 'Spotlight')
 		{
 			add(stageBuild.overlay);
 			rgb = new RGBPalette();
 			dadOpponent.shader = rgb.shader;
 			boyfriend.shader = rgb.shader;
-		}
+		}*/
 
 		add(stageBuild.foreground);
 
@@ -663,6 +674,11 @@ class PlayState extends MusicBeatState
 			noteCalls();
 		}
 
+		for (i in shaderUpdates)
+		{
+			i(elapsed);
+		}
+
 	}
 
 	function noteCalls()
@@ -1012,6 +1028,120 @@ class PlayState extends MusicBeatState
 
 		character.playAnim(stringArrow, true);
 		character.holdTimer = 0;
+	}
+
+	public function addShaderToCamera(cam:String, effect:ShaderEffect)
+	{ // STOLE FROM ANDROMEDA AND PSYCH ENGINE 0.5.1 WITH SHADERS
+		switch (cam.toLowerCase())
+		{
+			case 'camhud' | 'hud':
+				camHUDShaders.push(effect);
+				var newCamEffects:Array<BitmapFilter> = []; // IT SHUTS HAXE UP IDK WHY BUT WHATEVER IDK WHY I CANT JUST ARRAY<SHADERFILTER>
+				for (i in camHUDShaders)
+				{
+					newCamEffects.push(new ShaderFilter(i.shader));
+				}
+				camHUD.setFilters(newCamEffects);
+			case 'dialogueHUD' | 'dialogue':
+				dialogueHUDShaders.push(effect);
+				var newCamEffects:Array<BitmapFilter> = []; // IT SHUTS HAXE UP IDK WHY BUT WHATEVER IDK WHY I CANT JUST ARRAY<SHADERFILTER>
+				for (i in dialogueHUDShaders)
+				{
+					newCamEffects.push(new ShaderFilter(i.shader));
+				}
+				dialogueHUD.setFilters(newCamEffects);
+			case 'camgame' | 'game':
+				camGameShaders.push(effect);
+				var newCamEffects:Array<BitmapFilter> = []; // IT SHUTS HAXE UP IDK WHY BUT WHATEVER IDK WHY I CANT JUST ARRAY<SHADERFILTER>
+				for (i in camGameShaders)
+				{
+					newCamEffects.push(new ShaderFilter(i.shader));
+				}
+				camGame.setFilters(newCamEffects);
+			default:
+				{
+					var OBJ = Reflect.getProperty(PlayState.instance, cam);
+					Reflect.setProperty(OBJ, "shader", effect.shader);
+				}
+		}
+	}
+
+	public function removeShaderFromCamera(cam:String, effect:ShaderEffect)
+	{
+		switch (cam.toLowerCase())
+		{
+			case 'camhud' | 'hud':
+				camHUDShaders.remove(effect);
+				var newCamEffects:Array<BitmapFilter> = [];
+				for (i in camHUDShaders)
+				{
+					newCamEffects.push(new ShaderFilter(i.shader));
+				}
+				camHUD.setFilters(newCamEffects);
+			case 'dialogueHUD' | 'dialogue':
+				dialogueHUDShaders.remove(effect);
+				var newCamEffects:Array<BitmapFilter> = [];
+				for (i in dialogueHUDShaders)
+				{
+					newCamEffects.push(new ShaderFilter(i.shader));
+				}
+				dialogueHUD.setFilters(newCamEffects);
+			default:
+				camGameShaders.remove(effect);
+				var newCamEffects:Array<BitmapFilter> = [];
+				for (i in camGameShaders)
+				{
+					newCamEffects.push(new ShaderFilter(i.shader));
+				}
+				camGame.setFilters(newCamEffects);
+		}
+	}
+
+	public function clearShaderFromCamera(cam:String)
+	{
+		switch (cam.toLowerCase())
+		{
+			case 'camhud' | 'hud':
+				camHUDShaders = [];
+				var newCamEffects:Array<BitmapFilter> = [];
+				camHUD.setFilters(newCamEffects);
+			case 'dialogueHUD' | 'dialogue':
+				dialogueHUDShaders = [];
+				var newCamEffects:Array<BitmapFilter> = [];
+				dialogueHUD.setFilters(newCamEffects);
+			default:
+				camGameShaders = [];
+				var newCamEffects:Array<BitmapFilter> = [];
+				camGame.setFilters(newCamEffects);
+		}
+	}
+
+	function addShader(effect:ShaderEffect) // IMPORTANTE!1!1!!
+	{
+		if (shaders.contains(effect))
+		{
+			return;
+		}
+
+		shaders.push(effect);
+
+		var newCamEffects:Array<BitmapFilter> = [];
+
+		for (i in shaders)
+		{
+			newCamEffects.push(new ShaderFilter(i.shader));
+		}
+
+		FlxG.camera.setFilters(newCamEffects);
+		camHUD.setFilters(newCamEffects);
+	}
+
+	function clearShaders() // IMPORTANTE!1!1!!
+	{
+		FlxG.camera.setFilters([]);
+		camHUD.setFilters([]);
+
+		shaders = [];
 	}
 
 	private function strumCallsAuto(cStrum:UIStaticArrow, ?callType:Int = 1, ?daNote:Note):Void

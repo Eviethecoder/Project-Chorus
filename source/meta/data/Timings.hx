@@ -23,7 +23,7 @@ class Timings
 		"miss" => [4, 180, -100, -175],
 	];
 
-	public static var msThreshold:Float = 0;
+	public static var msThreshold:Float = Init.trueSettings.get('Judgment offsets');
 
 	// set the score judgements for later use
 	public static var scoreRating:Map<String, Int> = [

@@ -17,7 +17,7 @@ import flixel.group.FlxGroup.FlxTypedGroup;
 import flixel.group.FlxGroup;
 import flixel.math.FlxMath;
 import flixel.math.FlxPoint;
-import flixel.system.FlxSound;
+import flixel.sound.FlxSound;
 import flixel.text.FlxText;
 import flixel.ui.FlxButton;
 import flixel.ui.FlxSpriteButton;
@@ -43,8 +43,8 @@ import openfl.utils.ByteArray;
 
 using StringTools;
 
-@:access(flixel.system.FlxSound._sound)
-@:access(openfl.media.Sound.__buffer)
+@:access(flixel.sound.FlxSound)
+@:access(openfl.media.Sound)
 /**
 	In case you dont like the forever engine chart editor, here's the base game one instead.
 **/
@@ -118,7 +118,7 @@ class OriginalChartingState extends MusicBeatState
 	var rightIcon:HealthIcon;
 
 	public static var noteTypeList:Array<String> = // Used for backwards compatibility with 0.1 - 0.3.2 charts, though, you should add your hardcoded custom note types here too.
-		['', 'hurt',];
+		['', 'hurt','No anim'];
 
 	private var noteTypeIntMap:Map<Int, String> = new Map<Int, String>();
 	private var noteTypeMap:Map<String, Null<Int>> = new Map<String, Null<Int>>();

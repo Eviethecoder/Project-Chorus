@@ -1,6 +1,8 @@
 package meta.data;
 
+import flixel.FlxSprite;
 import flixel.system.FlxAssets.FlxShader;
+import flixel.util.FlxColor;
 
 
 class RGBPalette {

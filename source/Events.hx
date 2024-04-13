@@ -1,10 +1,9 @@
-
 package;
 
 import flixel.FlxBasic;
 import flixel.FlxG;
 import flixel.FlxSprite;
-import flixel.graphics.tile.FlxRuntimeShader;
+import flixel.addons.display.FlxRuntimeShader;
 import flixel.group.FlxSpriteGroup.FlxTypedSpriteGroup;
 import flixel.math.FlxMath;
 import flixel.text.FlxText;
@@ -34,14 +33,10 @@ class Events
 		switch (songName)
 		{
 			case "Lovely-sound":
-
-				rgb = new FlxRuntimeShader(Paths.shaderFragment('rbgeffect'));
-				PlayState.camGame.setFilters([new ShaderFilter(rgb)]);
-
+				// rgb = new FlxRuntimeShader(Paths.shaderFragment('vhs'));
+				// PlayState.camGame.setFilters([new ShaderFilter(rgb)]);
 		}
 	}
-
-	
 
 	public function onStep(curStep:Int)
 	{

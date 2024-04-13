@@ -63,6 +63,7 @@ class OptionsMenuState extends MusicBeatState
 					['Game Settings', null],
 					['', null],
 					['Downscroll', getFromOption],
+					
 					['Centered Notefield', getFromOption],
 					['Ghost Tapping', getFromOption],
 					['Display Accuracy', getFromOption],
@@ -72,13 +73,13 @@ class OptionsMenuState extends MusicBeatState
 					['Meta Settings', null],
 					['', null],
 					["Framerate Cap", getFromOption],
+					['Judgment offsets', getFromOption],
 					['FPS Counter', getFromOption],
 					['Memory Counter', getFromOption],
 					['Debug Info', getFromOption],
 					['', null],
 					['Forever Settings', null],
 					['', null],
-					['Use Forever Chart Editor', getFromOption],
 					['Custom Titlescreen', getFromOption]
 				]
 			],
@@ -390,7 +391,7 @@ class OptionsMenuState extends MusicBeatState
 					case Init.SettingTypes.Selector:
 						// selector
 						var selector:Selector = new Selector(10, letter.y, letter.text, Init.gameSettings.get(letter.text)[4],
-							(letter.text == 'Framerate Cap') ? true : false, (letter.text == 'Stage Darkness') ? true : false);
+							(letter.text == 'Framerate Cap') ? true : false, (letter.text == 'Stage Darkness') ? true : false, (letter.text == 'Judgment offsets') ? true : false);
 
 						extrasMap.set(letter, selector);
 					default:
@@ -456,6 +457,7 @@ class OptionsMenuState extends MusicBeatState
 
 	function updateSelector(selector:Selector, updateBy:Int)
 	{
+		var judge = selector.judge;
 		var fps = selector.fpsCap;
 		var bgdark = selector.darkBG;
 		if (fps)
@@ -481,6 +483,30 @@ class OptionsMenuState extends MusicBeatState
 			selector.chosenOptionString = Std.string(originalFPS);
 			selector.optionChosen.text = Std.string(originalFPS);
 			Init.trueSettings.set(activeSubgroup.members[curSelection].text, originalFPS);
+			Init.saveSettings();
+		}
+		if (judge)
+		{
+			// lazily hardcoded darkness cap
+			var originaldark = Init.trueSettings.get(activeSubgroup.members[curSelection].text);
+			var increase = 5 * updateBy;
+			if (originaldark + increase < 0)
+				increase = 0;
+			// high darkness cap
+			if (originaldark + increase > 100)
+				increase = 0;
+
+			if (updateBy == -1)
+				selector.selectorPlay('left', 'press');
+			else
+				selector.selectorPlay('right', 'press');
+
+			FlxG.sound.play(Paths.sound('scrollMenu'));
+
+			originaldark += increase;
+			selector.chosenOptionString = Std.string(originaldark);
+			selector.optionChosen.text = Std.string(originaldark);
+			Init.trueSettings.set(activeSubgroup.members[curSelection].text, originaldark);
 			Init.saveSettings();
 		}
 		else if (bgdark)

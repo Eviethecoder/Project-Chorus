@@ -32,4 +32,3 @@ void mainImage()
     fragColor = vec4(col,1.0);
 gl_FragColor.a = flixel_texture2D(bitmap, openfl_TextureCoordv).a;
 }
-//https://www.shadertoy.com/view/Mds3zn

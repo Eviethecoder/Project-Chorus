@@ -114,10 +114,15 @@ class Init extends FlxState
 		"UI Skin" => ['default', Selector, 'Choose a UI Skin for judgements, combo, etc.', NOT_FORCED, ''],
 		"Note Skin" => ['default', Selector, 'Choose a note skin.', NOT_FORCED, ''],
 		"Framerate Cap" => [120, Selector, 'Define your maximum FPS.', NOT_FORCED, ['']],
+		"Judgment offsets" => [
+			0,
+			Selector,
+			'allows you to set your custom jusgment offsets..in development.',
+			NOT_FORCED,['']],
 		"Opaque Arrows" => [false, Checkmark, "Makes the arrows at the top of the screen opaque again.", NOT_FORCED],
 		"Opaque Holds" => [false, Checkmark, "Huh, why isnt the trail cut off?", NOT_FORCED],
 		'Ghost Tapping' => [
-			false,
+			true,
 			Checkmark,
 			"Enables Ghost Tapping, allowing you to press inputs without missing.",
 			NOT_FORCED
@@ -254,6 +259,9 @@ class Init extends FlxState
 			|| trueSettings.get("Framerate Cap") < 30
 			|| trueSettings.get("Framerate Cap") > 360)
 			trueSettings.set("Framerate Cap", 30);
+
+		if (!Std.isOfType(trueSettings.get("Judgment offsets"), Int) || trueSettings.get("Judgment offsets") <  0|| trueSettings.get("Judgment offsets") > 100)
+			trueSettings.set("Judgment offsets", 0);
 
 		if (!Std.isOfType(trueSettings.get("Stage Darkness"), Int)
 			|| trueSettings.get("Stage Darkness") < 0

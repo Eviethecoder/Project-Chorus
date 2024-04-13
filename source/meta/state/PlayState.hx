@@ -7,16 +7,17 @@ import flixel.FlxObject;
 import flixel.FlxSprite;
 import flixel.FlxState;
 import flixel.FlxSubState;
+import flixel.addons.display.FlxRuntimeShader;
 import flixel.addons.effects.FlxTrail;
 import flixel.addons.transition.FlxTransitionableState;
-import flixel.graphics.tile.FlxRuntimeShader;
 import flixel.group.FlxGroup.FlxTypedGroup;
 import flixel.math.FlxMath;
 import flixel.math.FlxPoint;
 import flixel.math.FlxRandom;
 import flixel.math.FlxRect;
+import flixel.sound.FlxSound;
+import flixel.system.FlxAssets.FlxShader;
 import flixel.system.FlxAssets.FlxSoundAsset;
-import flixel.system.FlxSound;
 import flixel.tweens.FlxEase;
 import flixel.tweens.FlxTween;
 import flixel.util.FlxColor;
@@ -29,6 +30,7 @@ import gameObjects.userInterface.notes.Strumline.UIStaticArrow;
 import meta.*;
 import meta.MusicBeat.MusicBeatState;
 import meta.data.*;
+import meta.data.RGBPalette;
 import meta.data.Song.SwagSong;
 import meta.data.WiggleEffect;
 import meta.state.charting.*;
@@ -85,6 +87,7 @@ class PlayState extends MusicBeatState
 	// I'm funny just trust me
 	private var curSection:Int = 0;
 	private var camFollow:FlxObject;
+	public var rgb:RGBPalette;
 
 	// Discord RPC variables
 	public static var songDetails:String = "";
@@ -184,6 +187,8 @@ class PlayState extends MusicBeatState
 
 		// create the game camera
 		camGame = new FlxCamera();
+		
+		
 
 		// create the hud camera (separate so the hud stays on screen)
 		camHUD = new FlxCamera();
@@ -191,8 +196,9 @@ class PlayState extends MusicBeatState
 
 		FlxG.cameras.reset(camGame);
 		FlxG.cameras.add(camHUD);
+	
 		allUIs.push(camHUD);
-		FlxCamera.defaultCameras = [camGame];
+		FlxG.cameras.setDefaultDrawTarget(camGame, true);
 
 		// default song
 		if (SONG == null)
@@ -233,6 +239,8 @@ class PlayState extends MusicBeatState
 			engine for both myself and other modders to use!
 		 */
 		if(curStage =='Spotlight' ){
+
+		
 
 		 }
 
@@ -275,6 +283,9 @@ class PlayState extends MusicBeatState
 		if (curStage == 'Spotlight')
 		{
 			add(stageBuild.overlay);
+			rgb = new RGBPalette();
+			dadOpponent.shader = rgb.shader;
+			boyfriend.shader = rgb.shader;
 		}
 
 		add(stageBuild.foreground);
@@ -338,19 +349,10 @@ class PlayState extends MusicBeatState
 		strumLines.add(dadStrums);
 		strumLines.add(boyfriendStrums);
 
-		// strumline camera setup
-		strumHUD = [];
+	
 		for (i in 0...strumLines.length)
 		{
-			// generate a new strum camera
-			strumHUD[i] = new FlxCamera();
-			strumHUD[i].bgColor.alpha = 0;
-
-			strumHUD[i].cameras = [camHUD];
-			allUIs.push(strumHUD[i]);
-			FlxG.cameras.add(strumHUD[i]);
-			// set this strumline's camera to the designated camera
-			strumLines.members[i].cameras = [strumHUD[i]];
+			strumLines.members[i].cameras = [camHUD];
 		}
 		add(strumLines);
 
@@ -377,11 +379,11 @@ class PlayState extends MusicBeatState
 	override public function update(elapsed:Float)
 	{
 		stageBuild.stageUpdateConstant(elapsed, boyfriend, gf, dadOpponent);
-		/*if (curStage == 'Spotlight'){
+		if (curStage == 'Spotlight'){
 			//wiggle.update(elapsed);
-			rgb.setFloat('iTime', Sys.cpuTime() * elapsed);
-			rgb.setFloat("time", Sys.cpuTime() * elapsed);
-		}*/
+			
+			
+		}
 
 		super.update(elapsed);
 		if (SONG.song == 'Lovely-sound')
@@ -898,8 +900,9 @@ class PlayState extends MusicBeatState
 				character.playAnim('sing' + stringDirection.toUpperCase() + 'miss', false);
 				vocals.volume = 0;
 				decreaseCombo(true);
+				return;
 			}
-			else{
+			else if (coolNote.noteType != 2){
 				characterPlayAnimation(coolNote, character);
 			}
 			

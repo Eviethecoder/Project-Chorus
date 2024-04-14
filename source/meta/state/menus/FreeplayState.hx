@@ -19,6 +19,7 @@ import meta.data.*;
 import meta.data.Song.SwagSong;
 import meta.data.dependency.Discord;
 import meta.data.font.Alphabet;
+import meta.state.charting.*;
 import openfl.media.Sound;
 import sys.FileSystem;
 import sys.thread.Thread;
@@ -238,7 +239,7 @@ class FreeplayState extends MusicBeatState
 			threadActive = false;
 			if (FlxG.keys.pressed.SHIFT)
 			{
-				//Main.switchState(this, new  ChartingState());
+				Main.switchState(this, new OriginalChartingState());
 			}
 			else
 			{

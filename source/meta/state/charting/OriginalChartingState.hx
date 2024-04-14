@@ -62,6 +62,10 @@ class OriginalChartingState extends MusicBeatState
 
 	var curNoteType:Int = 0;
 
+	var lilStage:FlxSprite;
+	var lilBf:FlxSprite;
+	var lilOpp:FlxSprite;
+
 	public static var lastSection:Int = 0;
 
 	var bpmTxt:FlxText;
@@ -125,7 +129,14 @@ class OriginalChartingState extends MusicBeatState
 
 	override function create()
 	{
+		FlxG.save.data.chart_waveformVoices = false;
+		FlxG.save.data.chart_waveformInst = false;
 		super.create();
+		var bg:FlxSprite = new FlxSprite().loadGraphic(Paths.image('menus/base/menuBG'));
+		bg.scrollFactor.set();
+		bg.color = 0xFF222222;
+		add(bg);
+
 
 		curSection = lastSection;
 
@@ -169,6 +180,36 @@ class OriginalChartingState extends MusicBeatState
 
 		add(leftIcon);
 		add(rightIcon);
+
+		lilStage = new FlxSprite(32, 432).loadGraphic(Paths.image("UI/forever/base/chart editor/lilStage"), true, 256, 256);
+		lilStage.animation.add('idle', [0, 1], 0);
+		lilStage.animation.play('idle');
+		lilStage.scrollFactor.set();
+		add(lilStage);
+
+		lilBf = new FlxSprite(32, 432);
+		lilBf.frames = Paths.getSparrowAtlas('UI/forever/base/chart editor/lilBf');
+		lilBf.animation.addByPrefix('idle', 'idle', 24, false);
+		lilBf.animation.addByPrefix('0', 'left', 24, false);
+		lilBf.animation.addByPrefix('1', 'down', 24, false);
+		lilBf.animation.addByPrefix('2', 'up', 24, false);
+		lilBf.animation.addByPrefix('3', 'right', 24, false);
+		lilBf.animation.play("idle");
+		lilBf.scrollFactor.set();
+		add(lilBf);
+
+		lilOpp = new FlxSprite(32, 432);
+		lilOpp.frames = Paths.getSparrowAtlas('UI/forever/base/chart editor/lilOpp');
+		lilOpp.animation.addByPrefix('idle', 'idle', 24, true);
+		lilOpp.animation.addByPrefix('0', 'left', 24, true);
+		lilOpp.animation.addByPrefix('1', 'down', 24, true);
+		lilOpp.animation.addByPrefix('2', 'up', 24, true);
+		lilOpp.animation.addByPrefix('3', 'right', 24, true);
+		lilOpp.scrollFactor.set();
+		lilOpp.animation.play("idle");
+		add(lilOpp);
+	
+	
 
 		leftIcon.setPosition(0, -100);
 		rightIcon.setPosition(gridBG.width / 2, -100);
@@ -1063,11 +1104,14 @@ class OriginalChartingState extends MusicBeatState
 		{
 			if (FlxG.keys.justPressed.SPACE)
 			{
+				
 				if (songMusic.playing)
 				{
 					songMusic.pause();
 					vocals.pause();
 					oppvocals.pause();
+					lilBf.animation.play("idle");
+					lilOpp.animation.play("idle");
 					playedNote = [];
 				}
 				else
@@ -1075,6 +1119,8 @@ class OriginalChartingState extends MusicBeatState
 					vocals.play();
 					oppvocals.play();
 					songMusic.play();
+					lilBf.animation.play("idle");
+					lilOpp.animation.play("idle");
 				}
 			}
 
@@ -1088,6 +1134,8 @@ class OriginalChartingState extends MusicBeatState
 
 			if (FlxG.mouse.wheel != 0)
 			{
+				lilBf.animation.play("idle");
+				lilOpp.animation.play("idle");
 				songMusic.pause();
 				vocals.pause();
 				oppvocals.pause();
@@ -1182,9 +1230,20 @@ class OriginalChartingState extends MusicBeatState
 			{
 				note.alpha = 1;
 
-				if (note.strumTime <= Conductor.songPosition)
+				if (note.strumTime <= Conductor.songPosition )
 				{
 					note.alpha = 0.4;
+					var data:Int = note.noteData % 4;
+					var noteDataToCheck:Int = note.noteData;
+					var resetAnimLength:Float = (note.sustainLength / 1000) + 0.15;
+					
+
+					
+					if (note.mustPress && note.noteType != 2)
+						lilBf.animation.play("" + (note.noteData % 4), true);
+					else if (!note.mustPress && note.noteType != 2)
+						lilOpp.animation.play("" + (note.noteData % 4), true);
+					// trace('beep bop boob im playin ${note.noteData} note of ${note.mustPress ? 'player' : 'opponent'} strum with ${note.sustainLength} sustain length');
 				}
 				if (!cancel && !playedNote.contains(note) && (note.strumTime <= Conductor.songPosition) && enableHitsounds)
 				{
@@ -1273,6 +1332,8 @@ class OriginalChartingState extends MusicBeatState
 				vocals.pause();
 				oppvocals.pause();
 				playedNote = [];
+				lilBf.animation.play("idle");
+				lilOpp.animation.play("idle");
 
 				/*var daNum:Int = 0;
 					var daLength:Float = 0;
@@ -1290,6 +1351,8 @@ class OriginalChartingState extends MusicBeatState
 
 			updateGrid();
 			updateSectionUI();
+			lilBf.animation.play("idle");
+			lilOpp.animation.play("idle");
 		}
 	}
 
@@ -1419,8 +1482,7 @@ class OriginalChartingState extends MusicBeatState
 			}
 			note.mustPress = _song.notes[curSection].mustHitSection;
 			updateWaveform();
-			if (i[1] > 3)
-				note.mustPress = !note.mustPress;
+			
 		}
 	}
 

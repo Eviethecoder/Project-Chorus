@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<TextureAtlas imagePath="lilOpp.png">
+	<SubTexture name="idle0000" x="0" y="0" width="300" height="256"/>
+	<SubTexture name="idle0001" x="300" y="0" width="300" height="256"/>
+	<SubTexture name="left0000" x="0" y="256" width="300" height="256"/>
+	<SubTexture name="left0001" x="300" y="256" width="300" height="256"/>
+	<SubTexture name="left0002" x="600" y="256" width="300" height="256"/>
+	<SubTexture name="down0000" x="0" y="512" width="300" height="256"/>
+	<SubTexture name="down0001" x="300" y="512" width="300" height="256"/>
+	<SubTexture name="down0002" x="600" y="512" width="300" height="256"/>
+	<SubTexture name="up0000" x="0" y="768" width="300" height="256"/>
+	<SubTexture name="up0001" x="300" y="768" width="300" height="256"/>
+	<SubTexture name="up0002" x="600" y="768" width="300" height="256"/>
+	<SubTexture name="right0000" x="0" y="1024" width="300" height="256"/>
+	<SubTexture name="right0001" x="300" y="1024" width="300" height="256"/>
+	<SubTexture name="right0002" x="600" y="1024" width="300" height="256"/>
+</TextureAtlas>

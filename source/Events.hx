@@ -64,7 +64,16 @@ class Events
 		{
 			i(elapsed);
 		}
-		switch (songName) {}
+		
+		
+		
+		switch (songName) {
+			case 'Lovely-sound':
+				daShader.shader.rOffset.value = [FlxG.random.float(0.001, 0.0035)];
+				daShader.shader.gOffset.value = [0.0];
+				daShader.shader.bOffset.value = [FlxG.random.float(-0.001,  -0.0035)];
+				
+		}
 	}
 
 	public function onSection(section:Int)

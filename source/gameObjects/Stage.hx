@@ -344,20 +344,23 @@ class Stage extends FlxTypedGroup<FlxBasic>
 				add(bg);
 			case 'Spotlight':
 				
-				// sheddar = new FlxRuntimeShader(Paths.getTextFromFile('shader/rgbeffect3.frag', false));
-				// FlxG.camera.setFilters([new ShaderFilter(sheddar)]);
-				// camHUD.setFilters([new ShaderFilter(sheddar)]);
-				// // rgb = new RGBPalette();
-				// // FlxG.camera.setFilters([new ShaderFilter(rgb)]);
+				wiggle = new WiggleEffect();
+				wiggle.effectType = WiggleEffectType.DREAMY;
+				wiggle.waveAmplitude = 0.01; //love when shader code
+				wiggle.waveFrequency = 7;
+				wiggle.waveSpeed = 1;
 
 				sbg = new FNFSprite(-200, -100).loadGraphic(Paths.image('backgrounds/Spotlight/base'));
 				
 				sbg.scrollFactor.set(0.9, 0.9);
 				sbg.setGraphicSize(Std.int(sbg.width * 2));
+				sbg.shader = wiggle.shader;
 				add(sbg);
 				overlay = new FNFSprite( -200, -100).loadGraphic(Paths.image('backgrounds/Spotlight/overlay'));
 				overlay.setGraphicSize(Std.int(overlay.width * 2));
 				overlay.scrollFactor.set(0.9, 0.9);
+				foreground.add(overlay);
+				overlay.shader = wiggle.shader;
 				
 				whiteShit = new FlxSprite(-FlxG.width * FlxG.camera.zoom,
 					-FlxG.height * FlxG.camera.zoom + 300).makeGraphic(FlxG.width * 5, FlxG.height * 9, FlxColor.WHITE);
@@ -584,6 +587,8 @@ class Stage extends FlxTypedGroup<FlxBasic>
 	{
 		switch (PlayState.curStage)
 		{
+			case 'Spotlight':
+				wiggle.update(elapsed);
 			case 'philly':
 				if (trainMoving)
 				{

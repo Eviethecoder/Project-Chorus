@@ -249,12 +249,6 @@ class PlayState extends MusicBeatState
 			so I don't really know what I'm doing, I'm just hoping I can make a better and more optimised 
 			engine for both myself and other modders to use!
 		 */
-		if(curStage =='Spotlight' ){
-
-		
-
-		 }
-
 		// set up characters here too
 		gf = new Character(400, 130, stageBuild.returnGFtype(curStage));
 		gf.scrollFactor.set(0.95, 0.95);
@@ -291,13 +285,6 @@ class PlayState extends MusicBeatState
 
 		add(dadOpponent);
 		add(boyfriend);
-		/*if (curStage == 'Spotlight')
-		{
-			add(stageBuild.overlay);
-			rgb = new RGBPalette();
-			dadOpponent.shader = rgb.shader;
-			boyfriend.shader = rgb.shader;
-		}*/
 
 		add(stageBuild.foreground);
 
@@ -392,9 +379,9 @@ class PlayState extends MusicBeatState
 		stageBuild.stageUpdateConstant(elapsed, boyfriend, gf, dadOpponent);
 		if (curStage == 'Spotlight'){
 			//wiggle.update(elapsed);
-			
-			
 		}
+
+		eventHandler.onUpdate(elapsed);
 
 		super.update(elapsed);
 		if (SONG.song == 'Lovely-sound')

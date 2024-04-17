@@ -1454,9 +1454,7 @@ class OriginalChartingState extends MusicBeatState
 			var daNoteInfo = i[1];
 			var daStrumTime = i[0];
 			var daSus = i[2];
-			var daNoteType = 0;
-			if (i.length > 2)
-				daNoteType = i[3];
+			var daNoteType:Int = i[3];
 
 			var note:Note = ForeverAssets.generateArrow(PlayState.assetModifier, daStrumTime, daNoteInfo % 4, daNoteType, 0);
 			note.sustainLength = daSus;
@@ -1472,13 +1470,14 @@ class OriginalChartingState extends MusicBeatState
 				curRenderedSustains.add(setupSusNote(note));
 			if (daNoteType != 0)
 			{
-				// var noteTypeNum:AbsoluteText = new AbsoluteText(100, "" + Std.string(daNoteType));
-				// noteTypeNum.setFormat(24);
-				// noteTypeNum.offsetX = -32;
-				// noteTypeNum.offsetY = 6;
-				// noteTypeNum.borderSize = 1;
-				// curRenderedTexts.add(noteTypeNum);
-				// noteTypeNum.parent = note;
+				var noteTypeNum:AbsoluteText = new AbsoluteText(Std.string(daNoteType), 100);
+				noteTypeNum.setFormat(24);
+				noteTypeNum.offsetX = 12;
+				noteTypeNum.offsetY = 6;
+				noteTypeNum.setBorderStyle(OUTLINE, FlxColor.BLACK, 1.5);
+				noteTypeNum.borderSize = 1;
+				curRenderedTexts.add(noteTypeNum);
+				noteTypeNum.parent = note;
 			}
 			note.mustPress = _song.notes[curSection].mustHitSection;
 			updateWaveform();

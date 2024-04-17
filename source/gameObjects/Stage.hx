@@ -12,6 +12,7 @@ import flixel.group.FlxSpriteGroup;
 import flixel.math.FlxPoint;
 import flixel.sound.FlxSound;
 import flixel.text.FlxText;
+import flixel.tweens.FlxEase;
 import flixel.tweens.FlxTween;
 import flixel.util.FlxColor;
 import gameObjects.background.*;
@@ -489,7 +490,7 @@ class Stage extends FlxTypedGroup<FlxBasic>
 				boyfriend.x += 470;
 				boyfriend.y += -200;
 				dad.y == -100;
-				gf.y == -100;
+				gf.y += -200;
 				dad.x == 0;
 
 			case 'mallEvil':
@@ -580,6 +581,30 @@ class Stage extends FlxTypedGroup<FlxBasic>
 					trainCooldown = FlxG.random.int(-4, 0);
 					trainStart();
 				}
+		}
+	}
+
+	public function badApple(on:Bool, boyfriend:Boyfriend, gf:Character, dadOpponent:Character){
+
+		switch(on){
+			case true:
+				if (PlayState.curStage == 'Spotlight'){
+					FlxTween.tween(whiteShit, {alpha: 1.0}, 1.5, {ease: FlxEase.quadInOut});
+					overlay.shader = null;
+					FlxTween.tween(overlay, {alpha: 0}, 1.5, {ease: FlxEase.quadInOut});
+					// FlxTween.tween(boyfriend.colorTransform, {redOffset: boyfriend.healthColorArray[0]/255 , greenOffset: boyfriend.healthColorArray[1]/ 255, blueOffset: boyfriend.healthColorArray[2]/255}, 1.5, {ease: FlxEase.quadInOut});
+					FlxTween.color(dadOpponent, 1.5, FlxColor.WHITE, FlxColor.BLACK, {ease: FlxEase.quadInOut});
+					FlxTween.color(boyfriend, 1.5, FlxColor.WHITE, FlxColor.BLACK, {ease: FlxEase.quadInOut});
+				}
+			case false:
+				if (PlayState.curStage == 'Spotlight'){
+					FlxTween.tween(whiteShit, {alpha: 0}, 1.5, {ease: FlxEase.quadInOut});
+					FlxTween.tween(overlay, {alpha: 1.0}, 1.5, {ease: FlxEase.quadInOut});
+					FlxTween.color(boyfriend, 1.5, FlxColor.BLACK, FlxColor.WHITE, {ease: FlxEase.quadInOut});
+					FlxTween.color(dadOpponent, 1.5, FlxColor.BLACK, FlxColor.WHITE, {ease: FlxEase.quadInOut});
+					overlay.shader = wiggle.shader;
+				}
+				
 		}
 	}
 

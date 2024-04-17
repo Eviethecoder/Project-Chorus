@@ -18,8 +18,10 @@ import flixel.math.FlxRect;
 import flixel.sound.FlxSound;
 import flixel.system.FlxAssets.FlxShader;
 import flixel.system.FlxAssets.FlxSoundAsset;
+import flixel.text.FlxText;
 import flixel.tweens.FlxEase;
 import flixel.tweens.FlxTween;
+import flixel.tweens.misc.ColorTween;
 import flixel.util.FlxColor;
 import flixel.util.FlxSort;
 import flixel.util.FlxTimer;
@@ -46,6 +48,10 @@ import openfl.utils.Assets;
 import sys.io.File;
 
 using StringTools;
+
+#if sys
+import sys.FileSystem;
+#end
 
 #if !html5
 import meta.data.dependency.Discord;
@@ -81,6 +87,7 @@ class PlayState extends MusicBeatState
 	private var ratingArray:Array<String> = [];
 	private var allSicks:Bool = true;
 
+	private var updateTime:Bool = true;
 	// if you ever wanna add more keys
 	private var numberOfKeys:Int = 4;
 
@@ -112,6 +119,7 @@ class PlayState extends MusicBeatState
 	var startedCountdown:Bool = false;
 	var inCutscene:Bool = false;
 	
+	public static var songPercent:Float = 0;
 	var canPause:Bool = true;
 
 	var previousFrameTime:Int = 0;
@@ -127,6 +135,12 @@ class PlayState extends MusicBeatState
 
 	public static var defaultCamZoom:Float = 1.05;
 
+
+	// for the credits at beginning of song lol!
+	var creditsText:FlxTypedGroup<FlxText>;
+	var creditoText:FlxText;
+	var box:FlxSprite;
+
 	//epic event system!
 	var eventHandler:Events;
 
@@ -139,7 +153,8 @@ class PlayState extends MusicBeatState
 	public static var iconRPC:String = "";
 
 	public static var songLength:Float = 0;
-
+	public var cameraTwn:FlxTween;
+	public var colorTwn:ColorTween;
 	private var stageBuild:Stage;
 
 	public static var uiHUD:ClassHUD;
@@ -225,8 +240,6 @@ class PlayState extends MusicBeatState
 		
 		//
 
-		trace(SONG.stage);
-		trace(SONG.song);
 		// set up a class for the stage type in here afterwards
 		curStage = "";
 		// call the song's stage if it exists
@@ -295,6 +308,7 @@ class PlayState extends MusicBeatState
 
 		// set song position before beginning
 		Conductor.songPosition = -(Conductor.crochet * 4);
+		songLength = FlxG.sound.music.length;
 
 		// EVERYTHING SHOULD GO UNDER THIS, IF YOU PLAN ON SPAWNING SOMETHING LATER ADD IT TO STAGEBUILD OR FOREGROUND
 		// darken everything but the arrows and ui via a flxsprite
@@ -392,21 +406,30 @@ class PlayState extends MusicBeatState
 					dadOpponent.alpha = 0;
 					gf.alpha = 0; // shes stalking boyfriend
 					uiHUD.iconP2.alpha = 0;
+					uiHUD.healthBar.leftBar.color = FlxColor.BLACK;
 					
 
 				case(46):
-					
 					camFollow.setPosition(dadOpponent.getMidpoint().x, dadOpponent.getMidpoint().y);
 					FlxTween.tween(dadOpponent, {alpha: 1.0}, 0.9, {ease: FlxEase.cubeInOut});
 					FlxTween.tween(uiHUD.iconP2, {alpha: 1.0}, 0.9, {ease: FlxEase.cubeInOut});
+					//colorTwn = ColorTween.tween(0.9, FlxColor.BLACK,
+					//	FlxColor.fromRGB(dadOpponent.characterData.healthbarColors[0], dadOpponent.characterData.healthbarColors[1],
+					//		dadOpponent.characterData.healthbarColors[2]),
+					//	uiHUD.healthBar.leftBar);
 					FlxTween.tween(FlxG.camera, {zoom: 0.65}, 1.9, {
 						ease: FlxEase.linear,
 						onComplete: function(twn:FlxTween)
 						{
-							//healthBar.leftBar.color = FlxColor.fromRGB(dadOpponent.healthColorArray[0], dadOpponent.healthColorArray[1], dadOpponent.healthColorArray[2]);
+							uiHUD.healthBar.leftBar.color = FlxColor.fromRGB(dadOpponent.characterData.healthbarColors[0],
+								dadOpponent.characterData.healthbarColors[1], dadOpponent.characterData.healthbarColors[2]);
 							defaultCamZoom = 0.65;
 						}
 					});
+				case(208):
+					stageBuild.badApple(true, boyfriend, gf, dadOpponent);
+				case(240):
+					stageBuild.badApple(false, boyfriend, gf, dadOpponent);
 				case(303):
 					
 					camFollow.setPosition(boyfriend.getMidpoint().x, boyfriend.getMidpoint().y);
@@ -417,6 +440,15 @@ class PlayState extends MusicBeatState
 							//healthBar.leftBar.color = FlxColor.fromRGB(dadOpponent.healthColorArray[0], dadOpponent.healthColorArray[1], dadOpponent.healthColorArray[2]);
 							defaultCamZoom = 0.95;
 							camFollow.setPosition(dadOpponent.getMidpoint().x, dadOpponent.getMidpoint().y);
+						}
+					});
+				case(319):
+					cameraTwn = FlxTween.tween(FlxG.camera, {zoom: 0.65}, (1.0), {
+						ease: FlxEase.elasticInOut,
+						onComplete: function(twn:FlxTween)
+						{
+							cameraTwn = null;
+							defaultCamZoom = 0.65;
 						}
 					});
 				}
@@ -504,6 +536,11 @@ class PlayState extends MusicBeatState
 					songTime += FlxG.game.ticks - previousFrameTime;
 					previousFrameTime = FlxG.game.ticks;
 
+					if (updateTime)
+					{
+						var curTime:Float = Conductor.songPosition;
+						songPercent = (curTime / songLength);
+					}
 					// Interpolation type beat
 					if (Conductor.lastSongPos != Conductor.songPosition)
 					{
@@ -527,14 +564,7 @@ class PlayState extends MusicBeatState
 				{
 					var char = dadOpponent;
 
-					if (SONG.song == 'Lovely-sound'
-						&& curBeat >= 207
-						&& curBeat <= 240
-						|| SONG.song == 'Lovely-sound'
-						&& curBeat >= 319)
-					{
-						camFollow.setPosition(gf.getMidpoint().x, gf.getMidpoint().y);
-					}
+					
 					
 					
 					
@@ -581,11 +611,7 @@ class PlayState extends MusicBeatState
 				{
 					var char = boyfriend;
 
-					if (SONG.song == 'Lovely-sound'&& curBeat >= 207 && curBeat <= 240|| SONG.song == 'Lovely-sound'&& curBeat >= 319)
-					{
-						camFollow.setPosition(gf.getMidpoint().x, gf.getMidpoint().y);
-						
-					}
+				
 					var getCenterX = char.getMidpoint().x - 100;
 					var getCenterY = char.getMidpoint().y - 100;
 					switch (curStage)
@@ -602,9 +628,8 @@ class PlayState extends MusicBeatState
 							getCenterY = char.getMidpoint().y - 200;
 					}
 
-					if (SONG.song == 'lovely-sound'&& curBeat >= 207 && curBeat <= 240|| SONG.song == 'Lovely-sound'&& curBeat >= 319 )
+					if (SONG.song == 'Lovely-sound' && curBeat >= 207 && curBeat <= 240 || SONG.song == 'Lovely-sound' && curBeat >= 319)
 					{
-
 						camFollow.setPosition(gf.getMidpoint().x, gf.getMidpoint().y);
 					}
 					else
@@ -1269,6 +1294,25 @@ class PlayState extends MusicBeatState
 		//
 	}
 
+
+	function tweencredits()
+	{
+		FlxTween.tween(creditoText, {y: FlxG.height - 625}, 0.5, {ease: FlxEase.circOut});
+		FlxTween.tween(box, {y: 0}, 0.5, {ease: FlxEase.circOut});
+		// tween away
+		new FlxTimer().start(3, function(tmr:FlxTimer)
+		{
+			FlxTween.tween(creditoText, {y: -1000}, 0.5, {ease: FlxEase.circOut});
+			FlxTween.tween(box, {y: -1000}, 0.5, {ease: FlxEase.circOut});
+			// removal
+			new FlxTimer().start(0.5, function(tmr:FlxTimer)
+			{
+				remove(creditsText);
+				remove(box);
+			});
+		});
+	}
+
 	override public function onFocus():Void
 	{
 		if (!paused)
@@ -1526,6 +1570,67 @@ class PlayState extends MusicBeatState
 			updateRPC(false);
 			#end
 		}
+		creditsText = new FlxTypedGroup<FlxText>();
+		// in here, specify your song name and then its credits, then go to the next switch
+		switch (SONG.song.toLowerCase())
+		{
+			default:
+				box = new FlxSprite(0, -1000).loadGraphic(Paths.image("UI/default/base/box"));
+				box.cameras = [camHUD];
+				box.setGraphicSize(Std.int(box.height * 0.8));
+				box.screenCenter(X);
+				add(box);
+
+				var texti:String;
+				var size:String;
+
+				if (FileSystem.exists(Paths.json(curSong.toLowerCase() + "/credits")))
+				{
+					texti = File.getContent((Paths.json(curSong.toLowerCase() + "/credits"))).split("TIME")[0];
+					size = File.getContent((Paths.json(curSong.toLowerCase() + "/credits"))).split("SIZE")[1];
+				}
+				else
+				{
+					texti = "CREDITS\nunfinished";
+					size = '28';
+				}
+
+				creditoText = new FlxText(0, -1000, 0, texti, 28);
+				creditoText.cameras = [camHUD];
+				creditoText.setFormat(Paths.font("PressStart2P.ttf"), Std.parseInt(size), FlxColor.WHITE, CENTER, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
+				creditoText.setGraphicSize(Std.int(creditoText.width * 0.8));
+				creditoText.updateHitbox();
+				creditoText.x += 515;
+				creditsText.add(creditoText);
+		}
+		add(creditsText);
+
+		// this is the timing of the box coming in, specify your song and IF NEEDED, change the amount of time it takes to come in
+		// if you want to add it to start at the beginning of the song, type " | ", then add your song name
+		// poop fart ahahahahahah
+		switch (SONG.song.toLowerCase())
+		{
+			default:
+				var timei:String;
+
+				if (FileSystem.exists(Paths.json(curSong.toLowerCase() + "/credits")))
+				{
+					timei = File.getContent((Paths.json(curSong.toLowerCase() + "/credits"))).split("TIME")[1];
+				}
+				else
+				{
+					timei = "2.35";
+				}
+
+				FlxG.log.add('BTW THE TIME IS ' + Std.parseFloat(timei));
+
+				new FlxTimer().start(Std.parseFloat(timei), function(tmr:FlxTimer)
+				{
+					tweencredits();
+				});
+		}
+
+
 	}
 
 	private function generateSong(dataPath:String):Void

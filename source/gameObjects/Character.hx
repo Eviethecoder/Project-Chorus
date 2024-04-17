@@ -34,6 +34,7 @@ class Character extends FNFSprite
 	// By default, this option set to FALSE will make it so that the character only dances twice per major beat hit
 	// If set to on, they will dance every beat, such as Skid and Pump
 	public var quickDancer:Bool = false;
+	public var characterOffsets:Array<String>;
 
 	public var debugMode:Bool = false;
 
@@ -304,8 +305,8 @@ class Character extends FNFSprite
 
 				animation.addByPrefix('idle', 'ArchieIdle', 24, false);
 				animation.addByPrefix('singUP', 'ArchieUp', 24, false);
-				animation.addByPrefix('singLEFT', 'ArchieLeft', 24, false);
-				animation.addByPrefix('singRIGHT', 'ArchieRight', 24, false);
+				animation.addByPrefix('singLEFT', 'ArchieRight', 24, false);
+				animation.addByPrefix('singRIGHT', 'ArchieLeft', 24, false);
 				animation.addByPrefix('singDOWN', 'ArchieDown', 24, false);
 				//animation.addByPrefix('singUPmiss', 'BF NOTE UP MISS', 24, false);
 				//animation.addByPrefix('singLEFTmiss', 'BF NOTE LEFT MISS', 24, false);
@@ -318,7 +319,7 @@ class Character extends FNFSprite
 
 				characterData.healthbarColors = [68, 3, 28];
 				flipX = true;
-				characterData.singDuration = 5;
+				characterData.singDuration = 4;
 				scale.set(1.5, 1.5);
 			
 			/*
@@ -587,7 +588,7 @@ class Character extends FNFSprite
 		// set up offsets cus why not
 		if (OpenFlAssets.exists(Paths.offsetTxt(curCharacter + 'Offsets')))
 		{
-			var characterOffsets:Array<String> = CoolUtil.coolTextFile(Paths.offsetTxt(curCharacter + 'Offsets'));
+			characterOffsets = CoolUtil.coolTextFile(Paths.offsetTxt(curCharacter + 'Offsets'));
 			for (i in 0...characterOffsets.length)
 			{
 				var getterArray:Array<Array<String>> = CoolUtil.getOffsetsFromTxt(Paths.offsetTxt(curCharacter + 'Offsets'));
@@ -643,8 +644,8 @@ class Character extends FNFSprite
 				holdTimer += elapsed;
 			}
 
-			var singDuration:Float = 4;
-			if (holdTimer >= Conductor.stepCrochet * characterData.singDuration * 0.001)
+			var dadVar:Float = 4;
+			if (holdTimer >= Conductor.stepCrochet * dadVar * 0.001)
 			{
 				dance();
 				holdTimer = 0;

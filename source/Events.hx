@@ -69,9 +69,9 @@ class Events
 		
 		switch (songName) {
 			case 'Lovely-sound':
-				daShader.shader.rOffset.value = [FlxG.random.float(0.001, 0.0035)];
-				daShader.shader.gOffset.value = [0.0];
-				daShader.shader.bOffset.value = [FlxG.random.float(-0.001,  -0.0035)];
+				daShader.shader.rOffset.value = [FlxG.random.float(0.001, 0.0030)];
+				daShader.shader.gOffset.value = [FlxG.random.float(0.001, 0.0033)];
+				daShader.shader.bOffset.value = [FlxG.random.float(0.001,  0.0032)];
 				
 		}
 	}

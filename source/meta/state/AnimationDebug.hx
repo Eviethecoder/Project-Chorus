@@ -16,6 +16,7 @@ import openfl.net.FileReference;
 
 using StringTools;
 
+
 /**
 	*DEBUG MODE
  */
@@ -23,6 +24,9 @@ class AnimationDebug extends FlxState
 {
 	var bf:Boyfriend;
 	var dad:Character;
+	var bfghost:Boyfriend;
+	var dadghost:Character;
+	private var stageBuild:Stage;
 	var char:Character;
 	var textAnim:FlxText;
 	var dumbTexts:FlxTypedGroup<FlxText>;
@@ -42,15 +46,22 @@ class AnimationDebug extends FlxState
 	{
 		FlxG.sound.music.stop();
 
-		var gridBG:FlxSprite = FlxGridOverlay.create(10, 10);
-		gridBG.scrollFactor.set(0.5, 0.5);
-		add(gridBG);
+		stageBuild = new Stage('Spotlight');
+		add(stageBuild);
+
+		FlxG.camera.zoom -= 0.50;
 
 		if (daAnim == 'bf' || daAnim == 'Archie')
 			isDad = false;
 
 		if (isDad)
 		{
+			dadghost = new Boyfriend(0, 0, daAnim);
+			dadghost.screenCenter();
+			dadghost.alpha = 0.5;
+			dadghost.debugMode = true;
+			dadghost.flipX = false;
+			add(dadghost);
 			dad = new Character(0, 0, daAnim);
 			dad.screenCenter();
 			dad.debugMode = true;
@@ -64,20 +75,31 @@ class AnimationDebug extends FlxState
 			bf = new Boyfriend(0, 0, daAnim);
 			bf.screenCenter();
 			bf.debugMode = true;
-			add(bf);
-
-			char = bf;
 			bf.flipX = false;
+			bfghost = new Boyfriend(0, 0, daAnim);
+			bfghost.screenCenter();
+			bfghost.alpha = 0.5;
+			bfghost.debugMode = true;
+			bfghost.flipX = false;
+			add(bfghost);
+			bfghost.playAnim('idle');
+			add(bf);
+			char = bf;
+			add(stageBuild.overlay);
+
+			
 		}
+		
 
 		dumbTexts = new FlxTypedGroup<FlxText>();
 		add(dumbTexts);
 
-		textAnim = new FlxText(300, 16);
-		textAnim.size = 26;
+		textAnim = new FlxText(-100, -300);
+		textAnim.size = 66;
 		textAnim.scrollFactor.set();
+		
+		
 		add(textAnim);
-
 		genBoyOffsets();
 
 		camFollow = new FlxObject(0, 0, 2, 2);
@@ -95,9 +117,10 @@ class AnimationDebug extends FlxState
 
 		for (anim => offsets in char.animOffsets)
 		{
-			var text:FlxText = new FlxText(10, 20 + (18 * daLoop), 0, anim + ": " + offsets, 15);
+			var text:FlxText = new FlxText(-500, -300 + (18 * daLoop *2), 0, anim + ": " + offsets, 15);
 			text.scrollFactor.set();
 			text.color = FlxColor.BLUE;
+			text.scale.set(2.0,2.0);
 			dumbTexts.add(text);
 
 			if (pushList)
@@ -122,13 +145,17 @@ class AnimationDebug extends FlxState
 
 		if (FlxG.keys.justPressed.E)
 			FlxG.camera.zoom += 0.25;
-		if (FlxG.keys.justPressed.Q)
+		if (FlxG.keys.justPressed.Q){
+			trace(FlxG.camera.zoom);
 			FlxG.camera.zoom -= 0.25;
+		}
+		
 
 		if (FlxG.keys.pressed.I || FlxG.keys.pressed.J || FlxG.keys.pressed.K || FlxG.keys.pressed.L)
 		{
 			if (FlxG.keys.pressed.I)
 				camFollow.velocity.y = -90;
+				
 			else if (FlxG.keys.pressed.K)
 				camFollow.velocity.y = 90;
 			else

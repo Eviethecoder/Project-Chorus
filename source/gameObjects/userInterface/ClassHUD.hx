@@ -16,6 +16,7 @@ import flixel.ui.FlxBar;
 import flixel.util.FlxColor;
 import flixel.util.FlxSort;
 import flixel.util.FlxTimer;
+import gameObjects.HealthBar;
 import meta.CoolUtil;
 import meta.CoolUtil;
 import meta.InfoHud;
@@ -41,12 +42,14 @@ class ClassHUD extends FlxSpriteGroup
 	var centerMark:FlxText; // song display name and difficulty at the center
 
 	private var healthBarBG:FlxSprite;
-	private var healthBar:FlxBar;
+	public var healthBar:HealthBar;
+	private var timeBar:HealthBar;
 
 	private var SONG = PlayState.SONG;
 
 	public var iconP1:HealthIcon;
 	public var iconP2:HealthIcon;
+
 
 	private var stupidHealth:Float = 0;
 
@@ -54,7 +57,7 @@ class ClassHUD extends FlxSpriteGroup
 
 	var infoDisplay:String = CoolUtil.dashToSpace(PlayState.SONG.song);
 	var diffDisplay:String = CoolUtil.difficultyFromNumber(PlayState.storyDifficulty);
-	var engineDisplay:String = "FOREVER ENGINE v" + Main.gameVersion;
+	var engineDisplay:String = "Project Chorus v" + Main.gameVersion;
 
 	public function new()
 	{
@@ -62,25 +65,20 @@ class ClassHUD extends FlxSpriteGroup
 		super();
 
 		// le healthbar setup
-		var barY = FlxG.height * 0.875;
+		
+		var barY = FlxG.height * 0.89;
 		if (Init.trueSettings.get('Downscroll'))
-			barY = 64;
-
-		healthBarBG = new FlxSprite(0,
-			barY).loadGraphic(Paths.image(ForeverTools.returnSkinAsset('healthBar', PlayState.assetModifier, PlayState.changeableSkin, 'UI')));
-		healthBarBG.screenCenter(X);
-		healthBarBG.scrollFactor.set();
-		add(healthBarBG);
-
-		healthBar = new FlxBar(healthBarBG.x + 4, healthBarBG.y + 4, RIGHT_TO_LEFT, Std.int(healthBarBG.width - 8), Std.int(healthBarBG.height - 8));
+			barY = 0.11;
+		healthBar = new HealthBar(0, FlxG.height * (barY), 'UI/default/base/healthBar', function() return stupidHealth, 0, 2);
+		healthBar.screenCenter(X);
+		healthBar.visible = true;
+		healthBar.alpha = 1;
+		healthBar.leftToRight = false;
 		healthBar.scrollFactor.set();
-		var colorData:Array<Int> = PlayState.boyfriend.characterData.healthbarColors;
-		var bfColor = FlxColor.fromRGB(colorData[0], colorData[1], colorData[2]);
-		var colorData:Array<Int> = PlayState.dadOpponent.characterData.healthbarColors;
-		var dadColor = FlxColor.fromRGB(colorData[0], colorData[1], colorData[2]);
-		healthBar.createFilledBar(dadColor, bfColor);
+
 		// healthBar
 		add(healthBar);
+		reloadHealthBarColors();
 
 
 		iconP1 = new HealthIcon(PlayState.boyfriend.characterData.iconoveride, true);
@@ -91,13 +89,16 @@ class ClassHUD extends FlxSpriteGroup
 		iconP2.y = healthBar.y - (iconP2.height / 2);
 		add(iconP2);
 
-		scoreBar = new FlxText(FlxG.width / 2, Math.floor(healthBarBG.y + 40), 0, scoreDisplay);
+		scoreBar = new FlxText(FlxG.width / 2, Math.floor(healthBar.y + 40), 0, scoreDisplay);
 		scoreBar.setFormat(Paths.font('vcr.ttf'), 18, FlxColor.WHITE);
 		scoreBar.setBorderStyle(OUTLINE, FlxColor.BLACK, 1.5);
 		updateScoreText();
 		// scoreBar.scrollFactor.set();
 		scoreBar.antialiasing = true;
 		add(scoreBar);
+
+		
+	
 
 		cornerMark = new FlxText(0, 0, 0, engineDisplay);
 		cornerMark.setFormat(Paths.font('vcr.ttf'), 18, FlxColor.WHITE);
@@ -109,7 +110,7 @@ class ClassHUD extends FlxSpriteGroup
 		centerMark = new FlxText(0, 0, 0, '-[ ${infoDisplay} ]-');
 		centerMark.setFormat(Paths.font('vcr.ttf'), 24, FlxColor.WHITE);
 		centerMark.setBorderStyle(OUTLINE, FlxColor.BLACK, 2);
-		add(centerMark);
+		
 		if (Init.trueSettings.get('Downscroll'))
 			centerMark.y = (FlxG.height - centerMark.height / 2) - 30;
 		else
@@ -117,6 +118,12 @@ class ClassHUD extends FlxSpriteGroup
 		centerMark.screenCenter(X);
 		centerMark.antialiasing = true;
 
+		timeBar = new HealthBar(0, centerMark.y + (centerMark.height / 4), 'UI/default/base/healthBar', function() return stupidHealth, 0, 1);
+		timeBar.scrollFactor.set();
+		timeBar.screenCenter(X);
+		timeBar.alpha = 0;
+		add(timeBar);
+		add(centerMark);
 		// counter
 		if (Init.trueSettings.get('Counter') != 'None')
 		{
@@ -152,7 +159,8 @@ class ClassHUD extends FlxSpriteGroup
 	override public function update(elapsed:Float)
 	{
 		// pain, this is like the 7th attempt
-		healthBar.percent = (PlayState.health * 50);
+		healthBar.percent = (PlayState.health*50);
+		timeBar.percent = (PlayState.songPercent);
 
 		//var iconLerp = 0.95;
 		var mult:Float = FlxMath.lerp(1, iconP1.scale.x, CoolUtil.boundTo(1 - (elapsed * 9), 0, 1));
@@ -171,16 +179,13 @@ class ClassHUD extends FlxSpriteGroup
 		iconP1.x = healthBar.x + (healthBar.width * (FlxMath.remapToRange(healthBar.percent, 0, 100, 100, 0) * 0.01) - iconOffset);
 		iconP2.x = healthBar.x + (healthBar.width * (FlxMath.remapToRange(healthBar.percent, 0, 100, 100, 0) * 0.01)) - (iconP2.width - iconOffset);
 
-		if (healthBar.percent < 20)
-			iconP1.animation.curAnim.curFrame = 1;
-		else
-			iconP1.animation.curAnim.curFrame = 0;
-
-		if (healthBar.percent > 80)
-			iconP2.animation.curAnim.curFrame = 1;
-		else
-			iconP2.animation.curAnim.curFrame = 0;
+		iconP1.updateAnim(healthBar.percent);
+		iconP2.updateAnim(100 - healthBar.percent);
 	}
+
+
+	
+
 
 	private final divider:String = " • ";
 
@@ -214,6 +219,14 @@ class ClassHUD extends FlxSpriteGroup
 		// update playstate
 		PlayState.detailsSub = scoreBar.text;
 		PlayState.updateRPC(false);
+	}
+	public function reloadHealthBarColors()
+	{
+		var colorData:Array<Int> = PlayState.boyfriend.characterData.healthbarColors;
+		var bfColor = FlxColor.fromRGB(colorData[0], colorData[1], colorData[2]);
+		var colorData:Array<Int> = PlayState.dadOpponent.characterData.healthbarColors;
+		var dadColor = FlxColor.fromRGB(colorData[0], colorData[1], colorData[2]);
+		healthBar.setColors(dadColor,bfColor);
 	}
 
 	public function beatHit()

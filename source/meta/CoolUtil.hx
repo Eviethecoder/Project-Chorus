@@ -69,6 +69,8 @@ class CoolUtil
 		return swagOffsets;
 	}
 
+	
+
 	public static function returnAssetsLibrary(library:String, ?subDir:String = 'assets/images'):Array<String>
 	{
 		//
@@ -111,4 +113,5 @@ class CoolUtil
 		}
 		return dumbArray;
 	}
+	
 }

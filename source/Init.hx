@@ -261,7 +261,7 @@ class Init extends FlxState
 			trueSettings.set("Framerate Cap", 30);
 
 		if (!Std.isOfType(trueSettings.get("Judgment offsets"), Int) || trueSettings.get("Judgment offsets") <  0|| trueSettings.get("Judgment offsets") > 100)
-			trueSettings.set("Judgment offsets", 0);
+			trueSettings.set("Judgment offsets", -100);
 
 		if (!Std.isOfType(trueSettings.get("Stage Darkness"), Int)
 			|| trueSettings.get("Stage Darkness") < 0

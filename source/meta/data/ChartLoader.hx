@@ -5,11 +5,14 @@ import flixel.FlxSprite;
 import flixel.math.FlxMath;
 import flixel.text.FlxText;
 import flixel.util.FlxColor;
+import flixel.util.FlxStringUtil;
 import gameObjects.userInterface.notes.*;
 import meta.data.Section.SwagSection;
 import meta.data.Song.SwagSong;
 import meta.state.PlayState;
 import meta.state.charting.ChartingState;
+
+using StringTools;
 
 /**
 	This is the chartloader class. it loads in charts, but also exports charts, the chart parameters are based on the type of chart, 
@@ -117,13 +120,80 @@ class ChartLoader
 				load charts from the base game, export charts to the base game, and generally handle everything with an accuracy similar to that
 				of the main game so it feels like loading things in works well.
 			 */
-			case 'forever':
+			case 'Psych':
 				/*
 					That being said, however, we also have forever charts, which are complete restructures with new custom features and such.
 					Will be useful for projects later on, and it will give you more control over things you can do with the chart and with the game.
 					I'll also make it really easy to convert charts, you'll just have to load them in and pick an export option! If you want to play
 					songs made in forever engine with the base game then you can do that too.
 				 */
+				var IMG_WIDTH:Int = 8;
+				var regex:EReg = new EReg("[ \t]*((\r\n)|\r|\n)[ \t]*", "g");
+
+				var csvData = FlxStringUtil.imageToCSV(Paths.file('songs/' + songData + '/' + songData + '_section' + section + '.png'));
+
+				var lines:Array<String> = regex.split(csvData);
+				var rows:Array<String> = lines.filter(function(line) return line != "");
+				csvData.replace("\n", ',');
+
+				var heightInTiles = rows.length;
+				var widthInTiles = 0;
+
+				var row:Int = 0;
+
+				// LMAOOOO STOLE ALL THIS FROM FLXBASETILEMAP LOLOL
+
+				var dopeArray:Array<Int> = [];
+				while (row < heightInTiles)
+				{
+					var rowString = rows[row];
+					if (rowString.endsWith(","))
+						rowString = rowString.substr(0, rowString.length - 1);
+					var columns = rowString.split(",");
+
+					if (columns.length == 0)
+					{
+						heightInTiles--;
+						continue;
+					}
+					if (widthInTiles == 0)
+					{
+						widthInTiles = columns.length;
+					}
+
+					var column = 0;
+					var pushedInColumn:Bool = false;
+					while (column < widthInTiles)
+					{
+						// the current tile to be added:
+						var columnString = columns[column];
+						var curTile = Std.parseInt(columnString);
+
+						if (curTile == null)
+							throw 'String in row $row, column $column is not a valid integer: "$columnString"';
+
+						if (curTile == 1)
+						{
+							if (column < 4)
+								dopeArray.push(column + 1);
+							else
+							{
+								var tempCol = (column + 1) * -1;
+								tempCol += 4;
+								dopeArray.push(tempCol);
+							}
+
+							pushedInColumn = true;
+						}
+
+						column++;
+					}
+
+					if (!pushedInColumn)
+						dopeArray.push(0);
+
+					row++;
+				}
 		}
 
 		return unspawnNotes;

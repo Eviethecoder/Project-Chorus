@@ -235,7 +235,13 @@ class PlayState extends MusicBeatState
 
 		/// here we determine the chart type!
 		// determine the chart type here
-		determinedChartType = "FNF";
+		if (SONG.song == 'Lovely-sound'){
+			determinedChartType = "Psych";
+		}
+		else{
+			determinedChartType = "FNF";
+		}
+		
 
 		
 		//
@@ -417,18 +423,20 @@ class PlayState extends MusicBeatState
 					//	FlxColor.fromRGB(dadOpponent.characterData.healthbarColors[0], dadOpponent.characterData.healthbarColors[1],
 					//		dadOpponent.characterData.healthbarColors[2]),
 					//	uiHUD.healthBar.leftBar);
-					FlxTween.tween(FlxG.camera, {zoom: 0.65}, 1.9, {
+						cameraTwn = FlxTween.tween(FlxG.camera, {zoom: 0.65}, (2.0), {
 						ease: FlxEase.linear,
-						onComplete: function(twn:FlxTween)
-						{
-							uiHUD.healthBar.leftBar.color = FlxColor.fromRGB(dadOpponent.characterData.healthbarColors[0],
-								dadOpponent.characterData.healthbarColors[1], dadOpponent.characterData.healthbarColors[2]);
-							defaultCamZoom = 0.65;
-						}
-					});
-				case(208):
+							onComplete: function(twn:FlxTween)
+							{
+								cameraTwn = null;
+								uiHUD.healthBar.leftBar.color = FlxColor.fromRGB(dadOpponent.characterData.healthbarColors[0],
+									dadOpponent.characterData.healthbarColors[1], dadOpponent.characterData.healthbarColors[2]);
+								defaultCamZoom = 0.65;
+								
+							}
+						});
+				case(198):
 					stageBuild.badApple(true, boyfriend, gf, dadOpponent);
-				case(240):
+				case(220):
 					stageBuild.badApple(false, boyfriend, gf, dadOpponent);
 				case(303):
 					
@@ -1597,7 +1605,7 @@ class PlayState extends MusicBeatState
 
 				creditoText = new FlxText(0, -1000, 0, texti, 28);
 				creditoText.cameras = [camHUD];
-				creditoText.setFormat(Paths.font("PressStart2P.ttf"), Std.parseInt(size), FlxColor.WHITE, CENTER, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
+				creditoText.setFormat(Paths.font("NiseGenesis.TTF"), Std.parseInt(size), FlxColor.WHITE, CENTER, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
 				creditoText.setGraphicSize(Std.int(creditoText.width * 0.8));
 				creditoText.updateHitbox();
 				creditoText.x += 515;

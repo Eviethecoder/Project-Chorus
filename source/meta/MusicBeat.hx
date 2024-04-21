@@ -39,7 +39,7 @@ class MusicBeatState extends FNFUIState
 			Main.dumpCache();
 
 		if (transIn != null)
-			trace('reg ' + transIn.region);
+			
 
 		super.create();
 

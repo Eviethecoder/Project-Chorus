@@ -18,8 +18,8 @@ import flixel.util.FlxSort;
 import flixel.util.FlxTimer;
 import gameObjects.HealthBar;
 import meta.CoolUtil;
-import meta.CoolUtil;
 import meta.InfoHud;
+import meta.Macros;
 import meta.data.Conductor;
 import meta.data.Conductor;
 import meta.data.Timings;
@@ -39,6 +39,7 @@ class ClassHUD extends FlxSpriteGroup
 	var scoreDisplay:String = 'beep bop bo skdkdkdbebedeoop brrapadop';
 
 	var cornerMark:FlxText; // engine mark at the upper right corner
+	var debugmark:FlxText; // engine mark at the upper right corner
 	var centerMark:FlxText; // song display name and difficulty at the center
 
 	private var healthBarBG:FlxSprite;
@@ -49,6 +50,8 @@ class ClassHUD extends FlxSpriteGroup
 
 	public var iconP1:HealthIcon;
 	public var iconP2:HealthIcon;
+
+	var enginebuild:String = "Build date:" +Macros.getBuildTime();
 
 
 	private var stupidHealth:Float = 0;
@@ -106,6 +109,12 @@ class ClassHUD extends FlxSpriteGroup
 		add(cornerMark);
 		cornerMark.setPosition(FlxG.width - (cornerMark.width + 5), 5);
 		cornerMark.antialiasing = true;
+		#if debug
+		debugmark = new FlxText(cornerMark.x -100 , cornerMark.y +50, 0, enginebuild);
+		debugmark.setFormat(Paths.font('vcr.ttf'), 18, FlxColor.WHITE);
+		debugmark.setBorderStyle(OUTLINE, FlxColor.BLACK, 2);
+		add(debugmark);
+		#end
 
 		centerMark = new FlxText(0, 0, 0, '-[ ${infoDisplay} ]-');
 		centerMark.setFormat(Paths.font('vcr.ttf'), 24, FlxColor.WHITE);

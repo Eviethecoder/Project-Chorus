@@ -68,6 +68,8 @@ class DialogueBox extends FlxSpriteGroup
 		Epic Dialogue Documentation!
 
 		nothing yet :P
+
+		next to improve opon. will add diologue response options 
 	 */
 	public var box:FNFSprite;
 	public var bgFade:FlxSprite;

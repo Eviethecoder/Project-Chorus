@@ -589,19 +589,19 @@ class Stage extends FlxTypedGroup<FlxBasic>
 		switch(on){
 			case true:
 				if (PlayState.curStage == 'Spotlight'){
-					FlxTween.tween(whiteShit, {alpha: 1.0}, 1.5, {ease: FlxEase.quadInOut});
+					FlxTween.tween(whiteShit, {alpha: 1.0}, 0.8, {ease: FlxEase.quadInOut});
 					overlay.shader = null;
-					FlxTween.tween(overlay, {alpha: 0}, 1.5, {ease: FlxEase.quadInOut});
+					FlxTween.tween(overlay, {alpha: 0}, 0.8, {ease: FlxEase.quadInOut});
 					// FlxTween.tween(boyfriend.colorTransform, {redOffset: boyfriend.healthColorArray[0]/255 , greenOffset: boyfriend.healthColorArray[1]/ 255, blueOffset: boyfriend.healthColorArray[2]/255}, 1.5, {ease: FlxEase.quadInOut});
-					FlxTween.color(dadOpponent, 1.5, FlxColor.WHITE, FlxColor.BLACK, {ease: FlxEase.quadInOut});
-					FlxTween.color(boyfriend, 1.5, FlxColor.WHITE, FlxColor.BLACK, {ease: FlxEase.quadInOut});
+					FlxTween.color(dadOpponent, 0.8, FlxColor.WHITE, FlxColor.BLACK, {ease: FlxEase.quadInOut});
+					FlxTween.color(boyfriend, 0.8, FlxColor.WHITE, FlxColor.BLACK, {ease: FlxEase.quadInOut});
 				}
 			case false:
 				if (PlayState.curStage == 'Spotlight'){
-					FlxTween.tween(whiteShit, {alpha: 0}, 1.5, {ease: FlxEase.quadInOut});
-					FlxTween.tween(overlay, {alpha: 1.0}, 1.5, {ease: FlxEase.quadInOut});
-					FlxTween.color(boyfriend, 1.5, FlxColor.BLACK, FlxColor.WHITE, {ease: FlxEase.quadInOut});
-					FlxTween.color(dadOpponent, 1.5, FlxColor.BLACK, FlxColor.WHITE, {ease: FlxEase.quadInOut});
+					FlxTween.tween(whiteShit, {alpha: 0}, 0.8, {ease: FlxEase.quadInOut});
+					FlxTween.tween(overlay, {alpha: 1.0}, 0.8, {ease: FlxEase.quadInOut});
+					FlxTween.color(boyfriend, 0.8, FlxColor.BLACK, FlxColor.WHITE, {ease: FlxEase.quadInOut});
+					FlxTween.color(dadOpponent, 0.8, FlxColor.BLACK, FlxColor.WHITE, {ease: FlxEase.quadInOut});
 					overlay.shader = wiggle.shader;
 				}
 				

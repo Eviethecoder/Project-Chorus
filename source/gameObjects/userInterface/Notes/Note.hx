@@ -25,6 +25,7 @@ class Note extends FNFSprite
 	public var noteAlt:Float = 0;
 	public var noteType:Float = 0;
 	public var noteString:String = "";
+	
 
 	public var canBeHit:Bool = false;
 	public var tooLate:Bool = false;
@@ -41,7 +42,8 @@ class Note extends FNFSprite
 	// not set initially
 	public var noteQuant:Int = -1;
 	public var noteVisualOffset:Float = 0;
-	public var noteSpeed:Float = 0;
+	public  var noteSpeed:Float = 0;
+	
 	public var noteDirection:Float = 0;
 
 	public static var swagWidth:Float = 160 * 0.7;
@@ -94,7 +96,7 @@ class Note extends FNFSprite
 	public static function returnDefaultNote(assetModifier, strumTime, noteData, noteType, noteAlt, ?isSustainNote:Bool = false, ?prevNote:Note = null):Note
 	{
 		var newNote:Note = new Note(strumTime, noteData, noteAlt, prevNote, isSustainNote);
-
+		
 		newNote.noteType = noteType;
 		//trace(noteType);
 		// frames originally go here
@@ -146,6 +148,7 @@ class Note extends FNFSprite
 				newNote.setGraphicSize(Std.int(newNote.width * 0.7));
 				newNote.updateHitbox();
 				newNote.antialiasing = true;
+				
 				if (newNote.noteType == 1){
 					newNote.frames = Paths.getSparrowAtlas(ForeverTools.returnSkinAsset('HURTNOTE_assets', assetModifier, Init.trueSettings.get("Note Skin"),
 						'noteskins/notes'));
@@ -166,6 +169,7 @@ class Note extends FNFSprite
 					newNote.antialiasing = true;
 					
 				}
+			
 				
 				
 		}

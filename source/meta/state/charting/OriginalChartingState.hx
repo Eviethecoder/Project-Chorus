@@ -122,7 +122,7 @@ class OriginalChartingState extends MusicBeatState
 	var rightIcon:HealthIcon;
 
 	public static var noteTypeList:Array<String> = // Used for backwards compatibility with 0.1 - 0.3.2 charts, though, you should add your hardcoded custom note types here too.
-		['', 'hurt','No anim'];
+		['', 'hurt','No anim','speedtest'];
 
 	private var noteTypeIntMap:Map<Int, String> = new Map<Int, String>();
 	private var noteTypeMap:Map<String, Null<Int>> = new Map<String, Null<Int>>();
@@ -1190,13 +1190,15 @@ class OriginalChartingState extends MusicBeatState
 					oppvocals.time = songMusic.time;
 				}
 			}
-			if (FlxG.keys.justPressed.Z && curZoom > 0 && !FlxG.keys.pressed.CONTROL)
+			if (FlxG.keys.justPressed.Z && curZoom > 0 && zoomList[curZoom] != 1 && !FlxG.keys.pressed.CONTROL)
 			{
+				trace(zoomList[curZoom]);
 				--curZoom;
 				updateZoom();
 			}
-			if (FlxG.keys.justPressed.X && curZoom < zoomList.length - 1)
+			if (FlxG.keys.justPressed.X && curZoom < zoomList.length - 1 && zoomList[curZoom] != 8 )
 			{
+				trace(zoomList[curZoom]);
 				curZoom++;
 				updateZoom();
 			}

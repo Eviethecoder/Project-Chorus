@@ -74,6 +74,7 @@ class PlayState extends MusicBeatState
 	public static var oppvocals:FlxSound;
 	public var wiggle:WiggleEffect;
 
+	public var speedmod:Int;
 	public static var campaignScore:Int = 0;
 
 	public static var dadOpponent:Character;
@@ -90,6 +91,7 @@ class PlayState extends MusicBeatState
 	private var updateTime:Bool = true;
 	// if you ever wanna add more keys
 	private var numberOfKeys:Int = 4;
+	public static var playerLane:Int = 1;
 
 	// get it cus release
 	// I'm funny just trust me
@@ -182,12 +184,17 @@ class PlayState extends MusicBeatState
 	public var camHUDShaders:Array<ShaderEffect> = [];
 	public var dialogueHUDShaders:Array<ShaderEffect> = [];
 
+	var botplayAlpha:Float = 0;
+	public var botplayText:FlxText;
+	public var botplaySine:Float = 0;
+	public var botplaySubtext:FlxText;
 
 	public static var shaders:Array<ShaderEffect> = [];
 	public static var shaderUpdate:Array<Float->Void> = [];
 
 	override public function create()
 	{
+		
 		super.create();
 
 		// reset any values and variables that are static
@@ -235,12 +242,9 @@ class PlayState extends MusicBeatState
 
 		/// here we determine the chart type!
 		// determine the chart type here
-		if (SONG.song == 'Lovely-sound'){
-			determinedChartType = "Psych";
-		}
-		else{
-			determinedChartType = "FNF";
-		}
+	
+		determinedChartType = "FNF";
+		
 		
 
 		
@@ -379,11 +383,19 @@ class PlayState extends MusicBeatState
 		uiHUD.cameras = [camHUD];
 		//
 
+		
+		
 		// create a hud over the hud camera for dialogue
 		dialogueHUD = new FlxCamera();
 		dialogueHUD.bgColor.alpha = 0;
 		FlxG.cameras.add(dialogueHUD);
 
+		botplayText = new FlxText(400, 75 + (Init.trueSettings.get('Downscroll') ? FlxG.height - 200 : 0), FlxG.width - 800, "BOTPLAY", 32);
+		botplayText.setFormat(Paths.font("vcr.ttf"), 32, FlxColor.WHITE, CENTER, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
+		botplayText.scrollFactor.set();
+		botplayText.borderSize = 1.25;
+		add(botplayText);
+		botplayText.cameras = [dialogueHUD];
 		// call the funny intro cutscene depending on the song
 		if (!skipCutscenes())
 			songIntroCutscene();
@@ -396,6 +408,12 @@ class PlayState extends MusicBeatState
 
 	override public function update(elapsed:Float)
 	{
+
+
+
+
+		
+
 		stageBuild.stageUpdateConstant(elapsed, boyfriend, gf, dadOpponent);
 		if (curStage == 'Spotlight'){
 			//wiggle.update(elapsed);
@@ -413,31 +431,33 @@ class PlayState extends MusicBeatState
 					gf.alpha = 0; // shes stalking boyfriend
 					uiHUD.iconP2.alpha = 0;
 					uiHUD.healthBar.leftBar.color = FlxColor.BLACK;
+
 					
 
 				case(46):
 					camFollow.setPosition(dadOpponent.getMidpoint().x, dadOpponent.getMidpoint().y);
 					FlxTween.tween(dadOpponent, {alpha: 1.0}, 0.9, {ease: FlxEase.cubeInOut});
 					FlxTween.tween(uiHUD.iconP2, {alpha: 1.0}, 0.9, {ease: FlxEase.cubeInOut});
+					FlxTween.color(uiHUD.healthBar.leftBar, 0.9, FlxColor.BLACK,
+						FlxColor.fromRGB(dadOpponent.characterData.healthbarColors[0], dadOpponent.characterData.healthbarColors[1],
+							dadOpponent.characterData.healthbarColors[2]), {ease: FlxEase.quadInOut});
 					//colorTwn = ColorTween.tween(0.9, FlxColor.BLACK,
 					//	FlxColor.fromRGB(dadOpponent.characterData.healthbarColors[0], dadOpponent.characterData.healthbarColors[1],
 					//		dadOpponent.characterData.healthbarColors[2]),
 					//	uiHUD.healthBar.leftBar);
-						cameraTwn = FlxTween.tween(FlxG.camera, {zoom: 0.65}, (2.0), {
+						cameraTwn = FlxTween.tween(FlxG.camera, {zoom: 0.65}, (4.0), {
 						ease: FlxEase.linear,
 							onComplete: function(twn:FlxTween)
 							{
 								cameraTwn = null;
-								uiHUD.healthBar.leftBar.color = FlxColor.fromRGB(dadOpponent.characterData.healthbarColors[0],
-									dadOpponent.characterData.healthbarColors[1], dadOpponent.characterData.healthbarColors[2]);
 								defaultCamZoom = 0.65;
 								
 							}
 						});
-				case(198):
+				case(208):
 					stageBuild.badApple(true, boyfriend, gf, dadOpponent);
-				case(220):
-					stageBuild.badApple(false, boyfriend, gf, dadOpponent);
+				case(240):
+				 	stageBuild.badApple(false, boyfriend, gf, dadOpponent);
 				case(303):
 					
 					camFollow.setPosition(boyfriend.getMidpoint().x, boyfriend.getMidpoint().y);
@@ -486,6 +506,13 @@ class PlayState extends MusicBeatState
 			}
 
 		}
+		botplayAlpha = FlxMath.lerp(botplayAlpha, strumLines.members[playerLane].autoplay ? 1 : 0, elapsed / (1 / 60));
+		botplaySine += 180 * (elapsed / 4);
+		botplayText.alpha = botplayAlpha - Math.abs(Math.sin((Math.PI * botplaySine) / 180));
+		#if debug
+		if ((FlxG.keys.justPressed.SIX))
+			strumLines.members[playerLane].autoplay = !strumLines.members[playerLane].autoplay;
+		#end
 
 		if (!inCutscene) {
 			// pause the game if the game is allowed to pause and enter is pressed
@@ -752,13 +779,18 @@ class PlayState extends MusicBeatState
 
 				strumline.notesGroup.forEachAlive(function(daNote:Note)
 				{
+					if (daNote.noteType == 3)
+						speedmod = 50;
+					else
+						speedmod = 1;
+
 					// set the notes x and y
 					var downscrollMultiplier = 1;
 					if (Init.trueSettings.get('Downscroll'))
 						downscrollMultiplier = -1;
 
 					var psuedoY:Float = (downscrollMultiplier *
-						-((Conductor.songPosition - daNote.strumTime) * (0.45 * FlxMath.roundDecimal(daNote.noteSpeed, 2))));
+						-((Conductor.songPosition - daNote.strumTime) * (0.45 * FlxMath.roundDecimal(daNote.noteSpeed * speedmod, 2))));
 
 					var psuedoX = 25 + daNote.noteVisualOffset;
 

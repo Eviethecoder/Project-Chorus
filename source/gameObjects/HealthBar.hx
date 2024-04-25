@@ -12,6 +12,7 @@ class HealthBar extends FlxSpriteGroup
 	public var leftBar:FlxSprite;
 	public var rightBar:FlxSprite;
 	public var bg:FlxSprite;
+	public var bg2:FlxSprite;
 	public var valueFunction:Void->Float = function() return 0;
 	public var percent(default, set):Float = 0;
 	public var bounds:Dynamic = {min: 0, max: 1};
@@ -29,22 +30,27 @@ class HealthBar extends FlxSpriteGroup
 		
 		if(valueFunction != null) this.valueFunction = valueFunction;
 		setBounds(boundX, boundY);
-		
-		bg = new FlxSprite().loadGraphic(Paths.image(image));
+		bg2 = new FlxSprite().loadGraphic(Paths.image('UI/default/base/hpbar'));
+		//bg2.alpha = 0;
+		bg2.x += 180;
+		bg2.y += 100;
+		bg2.alpha =0;
+		bg = new FlxSprite().loadGraphic(Paths.image('UI/default/base/hptop'));
 		bg.antialiasing = true;
-		barWidth = Std.int(bg.width - 6);
-		barHeight = Std.int(bg.height - 6);
+		barWidth = Std.int(bg2.width - 5);
+		barHeight = Std.int(bg2.height - 8);
 
-		leftBar = new FlxSprite().makeGraphic(Std.int(bg.width), Std.int(bg.height), FlxColor.WHITE);
+		leftBar = new FlxSprite().makeGraphic(Std.int(bg2.width), Std.int(bg2.height), FlxColor.WHITE);
 		//leftBar.color = FlxColor.WHITE;
 		leftBar.antialiasing = antialiasing = true;
 
-		rightBar = new FlxSprite().makeGraphic(Std.int(bg.width), Std.int(bg.height), FlxColor.WHITE);
+		rightBar = new FlxSprite().makeGraphic(Std.int(bg2.width), Std.int(bg2.height), FlxColor.WHITE);
 		rightBar.color = FlxColor.BLACK;
 		rightBar.antialiasing = true;
 
 		add(leftBar);
 		add(rightBar);
+		add(bg2);
 		add(bg);
 		regenerateClips();
 	}
@@ -71,8 +77,8 @@ class HealthBar extends FlxSpriteGroup
 	{
 		if(leftBar == null || rightBar == null) return;
 
-		leftBar.setPosition(bg.x, bg.y);
-		rightBar.setPosition(bg.x, bg.y);
+		leftBar.setPosition(bg2.x, bg2.y);
+		rightBar.setPosition(bg2.x, bg2.y);
 
 		var leftSize:Float = 0;
 		if(leftToRight) leftSize = FlxMath.lerp(0, barWidth, percent / 100);
@@ -99,15 +105,15 @@ class HealthBar extends FlxSpriteGroup
 	{
 		if(leftBar != null)
 		{
-			leftBar.setGraphicSize(Std.int(bg.width), Std.int(bg.height));
+			leftBar.setGraphicSize(Std.int(bg2.width), Std.int(bg2.height));
 			leftBar.updateHitbox();
-			leftBar.clipRect = new FlxRect(0, 0, Std.int(bg.width), Std.int(bg.height));
+			leftBar.clipRect = new FlxRect(0, 0, Std.int(bg2.width), Std.int(bg2.height));
 		}
 		if(rightBar != null)
 		{
-			rightBar.setGraphicSize(Std.int(bg.width), Std.int(bg.height));
+			rightBar.setGraphicSize(Std.int(bg2.width), Std.int(bg2.height));
 			rightBar.updateHitbox();
-			rightBar.clipRect = new FlxRect(0, 0, Std.int(bg.width), Std.int(bg.height));
+			rightBar.clipRect = new FlxRect(0, 0, Std.int(bg2.width), Std.int(bg2.height));
 		}
 		updateBar();
 	}

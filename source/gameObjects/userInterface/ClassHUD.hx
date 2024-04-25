@@ -60,7 +60,7 @@ class ClassHUD extends FlxSpriteGroup
 
 	var infoDisplay:String = CoolUtil.dashToSpace(PlayState.SONG.song);
 	var diffDisplay:String = CoolUtil.difficultyFromNumber(PlayState.storyDifficulty);
-	var engineDisplay:String = "Project Chorus v" + Main.gameVersion;
+	var engineDisplay:String = "Project Chorus " + Main.gameVersion;
 
 	public function new()
 	{
@@ -71,13 +71,14 @@ class ClassHUD extends FlxSpriteGroup
 		
 		var barY = FlxG.height * 0.89;
 		if (Init.trueSettings.get('Downscroll'))
-			barY = 0.11;
-		healthBar = new HealthBar(0, FlxG.height * (barY), 'UI/default/base/healthBar', function() return stupidHealth, 0, 2);
+			barY = -0.03;
+		healthBar = new HealthBar(0, FlxG.height * (barY), 'UI/default/base/hptop', function() return stupidHealth, 0, 2);
 		healthBar.screenCenter(X);
 		healthBar.visible = true;
 		healthBar.alpha = 1;
 		healthBar.leftToRight = false;
 		healthBar.scrollFactor.set();
+		trace(healthBar.y);
 
 		// healthBar
 		add(healthBar);
@@ -85,14 +86,16 @@ class ClassHUD extends FlxSpriteGroup
 
 
 		iconP1 = new HealthIcon(PlayState.boyfriend.characterData.iconoveride, true);
-		iconP1.y = healthBar.y - (iconP1.height / 2);
+		iconP1.y = healthBar.y + 60;
+		iconP1.x += 825;
 		add(iconP1);
 
 		iconP2 = new HealthIcon(PlayState.dadOpponent.characterData.iconoveride, false);
-		iconP2.y = healthBar.y - (iconP2.height / 2);
+		iconP2.y = healthBar.y + 60;
+		iconP2.x += 300;
 		add(iconP2);
 
-		scoreBar = new FlxText(FlxG.width / 2, Math.floor(healthBar.y + 40), 0, scoreDisplay);
+		scoreBar = new FlxText(FlxG.width / 2, Math.floor(healthBar.y +40), 0, scoreDisplay);
 		scoreBar.setFormat(Paths.font('vcr.ttf'), 18, FlxColor.WHITE);
 		scoreBar.setBorderStyle(OUTLINE, FlxColor.BLACK, 1.5);
 		updateScoreText();
@@ -185,8 +188,8 @@ class ClassHUD extends FlxSpriteGroup
 
 		var iconOffset:Int = 26;
 
-		iconP1.x = healthBar.x + (healthBar.width * (FlxMath.remapToRange(healthBar.percent, 0, 100, 100, 0) * 0.01) - iconOffset);
-		iconP2.x = healthBar.x + (healthBar.width * (FlxMath.remapToRange(healthBar.percent, 0, 100, 100, 0) * 0.01)) - (iconP2.width - iconOffset);
+		
+		
 
 		iconP1.updateAnim(healthBar.percent);
 		iconP2.updateAnim(100 - healthBar.percent);

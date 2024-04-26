@@ -18,6 +18,7 @@ class HealthBar extends FlxSpriteGroup
 	public var bounds:Dynamic = {min: 0, max: 1};
 	public var leftToRight(default, set):Bool = true;
 	public var barCenter(default, null):Float = 0;
+	public var visibleRect:FlxRect;
 
 	// you might need to change this if you want to use a custom bar
 	public var barWidth(default, set):Int = 1;
@@ -33,8 +34,7 @@ class HealthBar extends FlxSpriteGroup
 		bg2 = new FlxSprite().loadGraphic(Paths.image('UI/default/base/hpbar'));
 		//bg2.alpha = 0;
 		bg2.x += 180;
-		bg2.y += 100;
-		bg2.alpha =0;
+		bg2.y += 1;
 		bg = new FlxSprite().loadGraphic(Paths.image('UI/default/base/hptop'));
 		bg.antialiasing = true;
 		barWidth = Std.int(bg2.width - 5);
@@ -51,6 +51,7 @@ class HealthBar extends FlxSpriteGroup
 		add(leftBar);
 		add(rightBar);
 		add(bg2);
+		bg2.alpha = 0;
 		add(bg);
 		regenerateClips();
 	}

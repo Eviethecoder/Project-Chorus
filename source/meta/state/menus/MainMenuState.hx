@@ -152,6 +152,8 @@ class MainMenuState extends MusicBeatState
 		var up_p = controls.UP_P;
 		var down_p = controls.DOWN_P;
 		var controlArray:Array<Bool> = [up, down, up_p, down_p];
+		if ((FlxG.keys.justPressed.SIX))
+			Main.switchState(this, new VideoState());
 
 		if ((controlArray.contains(true)) && (!selectedSomethin))
 		{

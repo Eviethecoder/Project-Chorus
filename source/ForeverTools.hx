@@ -12,7 +12,7 @@ import openfl.utils.Assets;
 class ForeverTools
 {
 	// set up maps and stuffs
-	public static function resetMenuMusic(resetVolume:Bool = false)
+	public static function resetMenuMusic(resetVolume:Bool = false, ?stopmusic:Bool)
 	{
 		// make sure the music is playing
 		if (((FlxG.sound.music != null) && (!FlxG.sound.music.playing)) || (FlxG.sound.music == null))
@@ -23,6 +23,9 @@ class ForeverTools
 				FlxG.sound.music.fadeIn(4, 0, 0.7);
 			// placeholder bpm
 			Conductor.changeBPM(102);
+		}
+		if (stopmusic == true){
+			FlxG.sound.music.stop();
 		}
 		//
 	}

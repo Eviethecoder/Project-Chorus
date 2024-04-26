@@ -40,6 +40,7 @@
 	<haxedev set='webgl' />
 
 	<haxelib name="flixel-addons" />
+	<haxelib name="hxCodec" if="desktop || android" />
 	<haxelib name="hscript" />
 	<haxelib name="flixel-ui" />
 	<haxelib name="polymod"/>
